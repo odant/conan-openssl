@@ -20,7 +20,7 @@ class OpensslConan(ConanFile):
     exports_sources = "src/*", "FindOpenSSL.cmake"
     no_copy_source = True
     build_policy = "missing"
-    
+        
     def configure(self):
         # DLL sign
         if self.settings.os != "Windows" or not self.options.shared:
@@ -33,6 +33,11 @@ class OpensslConan(ConanFile):
         # Pure C library
         del self.settings.compiler.libcxx
 
+    def build_requirements(self):
+        if self.settings.os == "Windows":
+            self.build_requires("strawberryperl/5.26.0@conan/stable")
+            self.build_requires("nasm/2.13.01@conan/stable")
+        
     def build(self):
         build_options = "threads"
         build_options += " no-zlib-dynamic"
@@ -43,7 +48,7 @@ class OpensslConan(ConanFile):
         if not self.options.shared:
             build_options += " no-shared"
         build_options += " --%s" % str(self.settings.build_type).lower()
-        build_options += " --prefix=%s" % self.package_folder
+        #build_options += " --prefix=%s" % self.package_folder
         self.output.info("--------------Start build--------------")
         if self.settings.os == "Linux":
             self.unix_build(build_options)
@@ -63,7 +68,11 @@ class OpensslConan(ConanFile):
         #self.run("make install_sw")
         
     def msvc_build(self, build_options):
-        pass
+        vcvars = tools.vcvars_command(self.settings)
+        target = "VC-WIN%s" % "64A" if self.settings.arch == "x86_64" else "32"
+        configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
+        self.run("%s && %s %s %s" % (vcvars, configure_cmd, target, build_options))
+        self.run("%s && %s" % (vcvars, "nmake"))
         
     def package(self):
         self.copy("FindOpenSSL.cmake", src=".", dst=".")
