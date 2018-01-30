@@ -37,6 +37,7 @@ class OpensslConan(ConanFile):
         if self.settings.os == "Windows":
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             self.build_requires("nasm/2.13.01@conan/stable")
+            self.build_requires("find_sdk_winxp/[~=1.0]@%s/stable" % self.user)
         
     def build(self):
         build_options = "threads"
@@ -45,10 +46,11 @@ class OpensslConan(ConanFile):
         build_options += " no-hw"
         build_options += " no-dso"
         build_options += " no-dynamic-engine"
+        if self.settings.build_type == "Debug":
+            build_options += " no-asm"
         if not self.options.shared:
             build_options += " no-shared"
         build_options += " --%s" % str(self.settings.build_type).lower()
-        #build_options += " --prefix=%s" % self.package_folder
         self.output.info("--------------Start build--------------")
         if self.settings.os == "Linux":
             self.unix_build(build_options)
@@ -57,29 +59,34 @@ class OpensslConan(ConanFile):
         self.output.info("--------------Build done---------------")
         
     def unix_build(self, build_options):
-#        if self.options.shared:
-#            build_options += r' -Wl,-rpath,"\$\$$\ORIGIN"'
         configure_cmd = os.path.join(self.source_folder, "src", "Configure")
         target = "linux-%s" % self.settings.arch
-        #with tools.environment_append({"LDFLAGS": r" -Wl,-rpath='\$\$ORIGIN' "}):
         self.run("%s %s %s" % (configure_cmd, build_options, target))
         self.run("make build_libs -j %s" % tools.cpu_count())
-        #self.run("make")
-        #self.run("make install_sw")
         
     def msvc_build(self, build_options):
-        vcvars = tools.vcvars_command(self.settings)
         target = "VC-WIN%s" % "64A" if self.settings.arch == "x86_64" else "32"
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
-        self.run("%s && %s %s %s" % (vcvars, configure_cmd, target, build_options))
-        self.run("%s && %s" % (vcvars, "nmake"))
+        env_vars = tools.vcvars_dict(self.settings, filter_known_paths=False)
+        with tools.pythonpath(self):
+            import find_sdk_winxp
+            env_vars = find_sdk_winxp.dict_append(self.settings.arch, env=env_vars)
+        with tools.environment_append(env_vars):
+            self.run("set")
+            self.run("perl --version")
+            self.run("%s %s %s" % (configure_cmd, target, build_options))
+            self.run("nmake build_libs")
         
     def package(self):
         self.copy("FindOpenSSL.cmake", src=".", dst=".")
         self.copy("*.h", src="src/include/openssl", dst="include/openssl", keep_path=False)
         self.copy("*.h", src="include/openssl", dst="include/openssl", keep_path=False)
+        if self.settings.os == "Windows":
+            self.copy("*applink.c", dst="include/openssl", keep_path=False)
         if self.options.shared:
             self.copy("*.so*", dst="lib", keep_path=False)
+            self.copy("*.lib", dst="lib", keep_path=False)
+            self.copy("*.dll", dst="bin", keep_path=False)
         else:
             self.copy("*.a", dst="lib", keep_path=False)
 
