@@ -83,10 +83,10 @@ class OpensslConan(ConanFile):
         self.copy("*.h", src="include/openssl", dst="include/openssl", keep_path=False)
         if self.settings.os == "Windows":
             self.copy("*applink.c", dst="include/openssl", keep_path=False)
-        if self.options.shared:
-            self.copy("*.so*", dst="lib", keep_path=False)
             self.copy("*.lib", dst="lib", keep_path=False)
             self.copy("*.dll", dst="bin", keep_path=False)
+        if self.options.shared:
+            self.copy("*.so*", dst="lib", keep_path=False)
         else:
             self.copy("*.a", dst="lib", keep_path=False)
 
