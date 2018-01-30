@@ -68,13 +68,13 @@ if(OPENSSL_INCLUDE_DIR AND EXISTS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h")
 endif ()
 
 find_library(OPENSSL_CRYPTO_LIBRARY
-    NAMES crypto
+    NAMES crypto libcrypto
     PATHS ${CONAN_LIB_DIRS_OPENSSL}
     NO_DEFAULT_PATH
 )
 
 find_library(OPENSSL_SSL_LIBRARY
-    NAMES ssl
+    NAMES ssl libssl
     PATHS ${CONAN_LIB_DIRS_OPENSSL}
     NO_DEFAULT_PATH
 )
