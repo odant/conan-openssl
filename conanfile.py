@@ -22,6 +22,8 @@ class OpensslConan(ConanFile):
     build_policy = "missing"
         
     def configure(self):
+        self.options["zlib"].shared=False
+        self.options["zlib"].minizip=False
         # DLL sign
         if self.settings.os != "Windows" or not self.options.shared:
             self.options.dll_sign = False
@@ -34,6 +36,8 @@ class OpensslConan(ConanFile):
         del self.settings.compiler.libcxx
 
     def build_requirements(self):
+        if self.options.shared:
+            self.build_requires("zlib/[~=1.2.11]@%s/stable" % self.user)
         if self.settings.os == "Windows":
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             self.build_requires("nasm/2.13.01@conan/stable")
@@ -41,7 +45,10 @@ class OpensslConan(ConanFile):
         
     def build(self):
         build_options = "threads"
+        build_options += " zlib"
         build_options += " no-zlib-dynamic"
+        build_options += " --with-zlib-include=%s" % self.deps_cpp_info["zlib"].include_paths[0]
+        build_options += " --with-zlib-lib=%s" % self.deps_cpp_info["zlib"].lib_paths[0]
         build_options += " no-unit-test"
         build_options += " no-hw"
         build_options += " no-dso"
