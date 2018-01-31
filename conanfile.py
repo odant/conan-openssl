@@ -1,5 +1,5 @@
 from conans import ConanFile, tools
-import os
+import os, glob
 
 
 class OpensslConan(ConanFile):
@@ -27,11 +27,6 @@ class OpensslConan(ConanFile):
         # DLL sign
         if self.settings.os != "Windows" or not self.options.shared:
             self.options.dll_sign = False
-        # Position indepent
-        #if self.settings.os == "Windows":
-        #    self.options.fPIC = False
-        #elif self.options.shared:
-        #    self.options.fPIC = True
         # Pure C library
         del self.settings.compiler.libcxx
 
@@ -40,6 +35,8 @@ class OpensslConan(ConanFile):
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             self.build_requires("nasm/2.13.01@conan/stable")
             self.build_requires("find_sdk_winxp/[~=1.0]@%s/stable" % self.user)
+        if self.options.dll_sign:
+            self.build_requires("find_windows_signtool/[~=1.0]@%s/stable" % self.user)
         
     def build(self):
         build_options = "threads"
@@ -84,6 +81,17 @@ class OpensslConan(ConanFile):
             self.run("perl --version")
             self.run("%s %s %s" % (configure_cmd, target, build_options))
             self.run("nmake build_libs")
+        # Sign DLL
+        if self.options.dll_sign:
+            with tools.pythonpath(self):
+                from find_windows_signtool import find_signtool
+                signtool = '"' + find_signtool(str(self.settings.arch)) + '"'
+                params =  "sign /a /t http://timestamp.verisign.com/scripts/timestamp.dll"
+                pattern = os.path.join(self.build_folder, "*.dll")
+                for fpath in glob.glob(pattern):
+                    self.output.info("Sign %s" % fpath)
+                    cmd = "{} {} {}".format(signtool, params, fpath)
+                    self.run(cmd)
         
     def package(self):
         self.copy("FindOpenSSL.cmake", src=".", dst=".")
@@ -91,10 +99,12 @@ class OpensslConan(ConanFile):
         self.copy("*.h", src="include/openssl", dst="include/openssl", keep_path=False)
         if self.settings.os == "Windows":
             self.copy("*applink.c", dst="include/openssl", keep_path=False)
-            self.copy("*.lib", dst="lib", keep_path=False)
-            self.copy("*.dll", dst="bin", keep_path=False)
-            self.copy("*libssl-*.pdb", dst="bin", keep_path=False)
-            self.copy("*libcrypto-*.pdb", dst="bin", keep_path=False)
+            self.copy("libcrypto.lib", src=self.build_folder, dst="lib", keep_path=False)
+            self.copy("libssl.lib", src=self.build_folder, dst="lib", keep_path=False)
+            self.copy("libcrypto-*.dll", src=self.build_folder, dst="bin", keep_path=False)
+            self.copy("libssl-*.dll", src=self.build_folder, dst="bin", keep_path=False)
+            self.copy("libcrypto-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
+            self.copy("libssl-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
         if self.options.shared:
             self.copy("*.so*", dst="lib", keep_path=False, symlinks=True)
         else:
