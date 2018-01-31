@@ -67,7 +67,11 @@ class OpensslConan(ConanFile):
         self.run("make build_libs -j %s" % tools.cpu_count())
         
     def msvc_build(self, build_options):
-        target = "VC-WIN%s" % "64A" if self.settings.arch == "x86_64" else "32"
+        target = "VC-WIN"
+        if self.settings.arch == "x86_64":
+            target += "64A"
+        else:
+            target += "32"
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
         env_vars = tools.vcvars_dict(self.settings, filter_known_paths=False)
         with tools.pythonpath(self):
