@@ -15,7 +15,6 @@ environment:
   CONAN_CHANNEL: testing
   CONAN_STABLE_CHANNEL: stable
 
-  CONAN_ARCHS: x86_64, x86
   CONAN_BUILD_TYPES: Debug, Release
   CONAN_VISUAL_RUNTIMES: MDd, MD
   
@@ -27,10 +26,22 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       CONAN_VISUAL_VERSIONS: 15
       CONAN_VISUAL_TOOLSETS: None, v141_xp
+      CONAN_ARCHS: x86_64
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CONAN_VISUAL_VERSIONS: 15
+      CONAN_VISUAL_TOOLSETS: None, v141_xp
+      CONAN_ARCHS: x86
 
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       CONAN_VISUAL_VERSIONS: 14
       CONAN_VISUAL_TOOLSETS: None, v140_xp
+      CONAN_ARCHS: x86_64
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      CONAN_VISUAL_VERSIONS: 14
+      CONAN_VISUAL_TOOLSETS: None, v140_xp
+      CONAN_ARCHS: x86
 
 install:
   - git submodule update --init --recursive
