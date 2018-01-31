@@ -97,6 +97,10 @@ class OpensslConan(ConanFile):
         self.copy("FindOpenSSL.cmake", src=".", dst=".")
         self.copy("*.h", src="src/include/openssl", dst="include/openssl", keep_path=False)
         self.copy("*.h", src="include/openssl", dst="include/openssl", keep_path=False)
+        if self.options.shared:
+            self.copy("*.so*", dst="lib", keep_path=False, symlinks=True)
+        else:
+            self.copy("*.a", dst="lib", keep_path=False)
         if self.settings.os == "Windows":
             self.copy("*applink.c", dst="include/openssl", keep_path=False)
             self.copy("libcrypto.lib", src=self.build_folder, dst="lib", keep_path=False)
@@ -105,10 +109,9 @@ class OpensslConan(ConanFile):
             self.copy("libssl-*.dll", src=self.build_folder, dst="bin", keep_path=False)
             self.copy("libcrypto-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
             self.copy("libssl-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
-        if self.options.shared:
-            self.copy("*.so*", dst="lib", keep_path=False, symlinks=True)
-        else:
-            self.copy("*.a", dst="lib", keep_path=False)
 
     def package_info(self):
-        pass
+        if self.settings.os == "Linux":
+            self.cpp_info.libs = ["ssl", "crypto", "dl", "pthread"]
+        elif self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
+            self.cpp_info.libs = ["ssl", "crypto", "crypt32", "msi", "ws2_32"]
