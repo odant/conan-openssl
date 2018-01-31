@@ -93,6 +93,8 @@ class OpensslConan(ConanFile):
             self.copy("*applink.c", dst="include/openssl", keep_path=False)
             self.copy("*.lib", dst="lib", keep_path=False)
             self.copy("*.dll", dst="bin", keep_path=False)
+            self.copy("*libssl-*.pdb", dst="bin", keep_path=False)
+            self.copy("*libcrypto-*.pdb", dst="bin", keep_path=False)
         if self.options.shared:
             self.copy("*.so*", dst="lib", keep_path=False, symlinks=True)
         else:
