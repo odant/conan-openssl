@@ -1,6 +1,12 @@
 from conans import ConanFile, tools
+from conans.errors import ConanException
 import os, glob
 
+def get_safe(options, name):
+    try:
+        return getattr(options, name, None)
+    except ConanException:
+        return None
 
 class OpensslConan(ConanFile):
     name = "openssl"
@@ -24,7 +30,7 @@ class OpensslConan(ConanFile):
     def configure(self):
         # DLL sign
         if self.settings.os != "Windows" or not self.options.shared:
-            self.options.dll_sign = False
+            del self.options.dll_sign
         # Pure C library
         del self.settings.compiler.libcxx
 
@@ -33,7 +39,7 @@ class OpensslConan(ConanFile):
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             self.build_requires("nasm/2.13.01@conan/stable")
             self.build_requires("find_sdk_winxp/[~=1.0]@%s/stable" % self.user)
-        if self.options.dll_sign:
+        if get_safe(self.options, "dll_sign"):
             self.build_requires("find_windows_signtool/[~=1.0]@%s/stable" % self.user)
         
     def build(self):
@@ -79,17 +85,6 @@ class OpensslConan(ConanFile):
             self.run("perl --version")
             self.run("%s %s %s" % (configure_cmd, target, build_options))
             self.run("nmake build_libs")
-        # Sign DLL
-        if self.options.dll_sign:
-            with tools.pythonpath(self):
-                from find_windows_signtool import find_signtool
-                signtool = '"' + find_signtool(str(self.settings.arch)) + '"'
-                params =  "sign /a /t http://timestamp.verisign.com/scripts/timestamp.dll"
-                pattern = os.path.join(self.build_folder, "*.dll")
-                for fpath in glob.glob(pattern):
-                    self.output.info("Sign %s" % fpath)
-                    cmd = "{} {} {}".format(signtool, params, fpath)
-                    self.run(cmd)
         
     def package(self):
         self.copy("FindOpenSSL.cmake", src=".", dst=".")
@@ -107,6 +102,16 @@ class OpensslConan(ConanFile):
             self.copy("libssl-*.dll", src=self.build_folder, dst="bin", keep_path=False)
             self.copy("libcrypto-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
             self.copy("libssl-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
+        # Sign DLL
+        if get_safe(self.options, "dll_sign"):
+            with tools.pythonpath(self):
+                from find_windows_signtool import find_signtool
+                signtool = '"' + find_signtool(str(self.settings.arch)) + '"'
+                params =  "sign /a /t http://timestamp.verisign.com/scripts/timestamp.dll"
+                pattern = os.path.join(self.package_folder, "bin", "*.dll")
+                for fpath in glob.glob(pattern):
+                    self.output.info("Sign %s" % fpath)
+                    self.run("%s %s %s" %(signtool, params, fpath))
 
     def package_info(self):
         if self.settings.os == "Linux":
