@@ -6,6 +6,11 @@ conan_basic_setup()
 
 find_package(OpenSSL REQUIRED)
 
+if(MSVC)
+    add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+    add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+endif()
+
 enable_testing()
 
 add_executable(test_openssl test_openssl.c)
