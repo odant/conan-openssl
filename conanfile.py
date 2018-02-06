@@ -22,8 +22,6 @@ class OpensslConan(ConanFile):
     build_policy = "missing"
         
     def configure(self):
-        self.options["zlib"].shared=False
-        self.options["zlib"].minizip=False
         # DLL sign
         if self.settings.os != "Windows" or not self.options.shared:
             self.options.dll_sign = False
