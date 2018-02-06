@@ -43,17 +43,18 @@ class OpensslConan(ConanFile):
             self.build_requires("find_windows_signtool/[~=1.0]@%s/stable" % self.user)
         
     def build(self):
-        build_options = "threads"
-        build_options += " no-comp"
-        build_options += " no-unit-test"
-        build_options += " no-hw"
-        build_options += " no-dso"
-        build_options += " no-dynamic-engine"
+        build_options = []
+        build_options.append("threads")
+        build_options.append("no-comp")
+        build_options.append("no-unit-test")
+        build_options.append("no-hw")
+        build_options.append("no-dso")
+        build_options.append("no-dynamic-engine")
         if self.settings.build_type == "Debug":
-            build_options += " no-asm"
+            build_options.append("no-asm")
         if not self.options.shared:
-            build_options += " no-shared"
-        build_options += " --%s" % str(self.settings.build_type).lower()
+            build_options.append("no-shared")
+        build_options.append("--%s" % str(self.settings.build_type).lower())
         self.output.info("--------------Start build--------------")
         if self.settings.os == "Linux":
             self.unix_build(build_options)
@@ -64,7 +65,7 @@ class OpensslConan(ConanFile):
     def unix_build(self, build_options):
         configure_cmd = os.path.join(self.source_folder, "src", "Configure")
         target = "linux-%s" % self.settings.arch
-        self.run("%s %s %s" % (configure_cmd, build_options, target))
+        self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
         self.run("make build_libs -j %s" % tools.cpu_count())
         
     def msvc_build(self, build_options):
@@ -83,7 +84,7 @@ class OpensslConan(ConanFile):
         with tools.environment_append(env_vars):
             self.run("set")
             self.run("perl --version")
-            self.run("%s %s %s" % (configure_cmd, target, build_options))
+            self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
             self.run("nmake build_libs")
         
     def package(self):
