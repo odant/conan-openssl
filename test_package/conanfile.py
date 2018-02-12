@@ -1,7 +1,7 @@
 from conans import ConanFile, CMake
 
 
-class ZlibTestConan(ConanFile):
+class PackageTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
 
