@@ -2,11 +2,13 @@ from conans import ConanFile, tools
 from conans.errors import ConanException
 import os, glob
 
+
 def get_safe(options, name):
     try:
         return getattr(options, name, None)
     except ConanException:
         return None
+
 
 class OpensslConan(ConanFile):
     name = "openssl"
@@ -118,4 +120,4 @@ class OpensslConan(ConanFile):
         if self.settings.os == "Linux":
             self.cpp_info.libs = ["ssl", "crypto", "dl", "pthread"]
         elif self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
-            self.cpp_info.libs = ["ssl", "crypto", "crypt32", "msi", "ws2_32"]
+            self.cpp_info.libs = ["libssl", "libcrypto", "crypt32", "msi", "ws2_32"]
