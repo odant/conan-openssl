@@ -37,9 +37,10 @@ class OpensslConan(ConanFile):
         del self.settings.compiler.libcxx
 
     def build_requirements(self):
-        if self.settings.os == "Windows":
+        if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             self.build_requires("nasm/2.13.01@conan/stable")
+            self.build_requires("get_vcvars/[~=1.0]@%s/stable" % self.user)
             self.build_requires("find_sdk_winxp/[~=1.0]@%s/stable" % self.user)
         if get_safe(self.options, "dll_sign"):
             self.build_requires("find_windows_signtool/[~=1.0]@%s/stable" % self.user)
@@ -77,13 +78,15 @@ class OpensslConan(ConanFile):
         else:
             target += "32"
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
-        env_vars = tools.vcvars_dict(self.settings, filter_known_paths=False)
-        t = str(self.settings.compiler.get_safe("toolset"))
-        if t.endswith("_xp"):
-            with tools.pythonpath(self):
+        env = {}
+        with tools.pythonpath(self):
+            import get_vcvars
+            env = get_vcvars.get_vcvars(self.settings)
+            toolset = str(self.settings.compiler.get_safe("toolset"))
+            if toolset.endswith("_xp"):
                 import find_sdk_winxp
-                env_vars = find_sdk_winxp.dict_append(self.settings.arch, env=env_vars)
-        with tools.environment_append(env_vars):
+                env = find_sdk_winxp.dict_append(self.settings.arch, env=env)
+        with tools.environment_append(env):
             self.run("set")
             self.run("perl --version")
             self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
