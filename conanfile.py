@@ -66,7 +66,7 @@ class OpensslConan(ConanFile):
         self.output.info("--------------Build done---------------")
         
     def unix_build(self, build_options):
-        configure_cmd = os.path.join(self.source_folder, "src", "Configure")
+        configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
         target = "linux-%s" % self.settings.arch
         self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
         self.run("make build_libs -j %s" % tools.cpu_count())
