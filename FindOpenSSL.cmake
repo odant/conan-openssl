@@ -81,29 +81,27 @@ find_library(OPENSSL_SSL_LIBRARY
 
 include(FindPackageHandleStandardArgs)
 
-if (OPENSSL_VERSION)
-  find_package_handle_standard_args(OpenSSL
+find_package_handle_standard_args(OpenSSL
     REQUIRED_VARS
-      OPENSSL_CRYPTO_LIBRARY
-      OPENSSL_SSL_LIBRARY
-      OPENSSL_INCLUDE_DIR
+        OPENSSL_CRYPTO_LIBRARY
+        OPENSSL_SSL_LIBRARY
+        OPENSSL_INCLUDE_DIR
     VERSION_VAR
-      OPENSSL_VERSION
-  )
-endif ()
-
-set(OPENSSL_LIBRARIES ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
-mark_as_advanced(OPENSSL_INCLUDE_DIR OPENSSL_LIBRARIES)
+        OPENSSL_VERSION
+)
 
 if(OPENSSL_FOUND)
+
     if(NOT TARGET OpenSSL::Crypto)
         add_library(OpenSSL::Crypto UNKNOWN IMPORTED)
         set_target_properties(OpenSSL::Crypto PROPERTIES
             INTERFACE_INCLUDE_DIRECTORIES "${OPENSSL_INCLUDE_DIR}"
             IMPORTED_LINK_INTERFACE_LANGUAGES "C"
             IMPORTED_LOCATION "${OPENSSL_CRYPTO_LIBRARY}"
+            INTERFACE_COMPILE_DEFINITIONS "${CONAN_COMPILE_DEFINITIONS_OPENSSL}"
         )
     endif()
+    
     if(NOT TARGET OpenSSL::SSL)
         add_library(OpenSSL::SSL UNKNOWN IMPORTED)
         set_target_properties(OpenSSL::SSL PROPERTIES
@@ -113,5 +111,12 @@ if(OPENSSL_FOUND)
             INTERFACE_LINK_LIBRARIES OpenSSL::Crypto
         )
     endif()
+
+    set(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})    
+    set(OPENSSL_LIBRARIES ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})    
+    set(OPENSSL_DEFINITIONS ${CONAN_COMPILE_DEFINITIONS_OPENSSL})
+
+    mark_as_advanced(OPENSSL_INCLUDE_DIR OPENSSL_LIBRARIES)
+    
 endif()
 

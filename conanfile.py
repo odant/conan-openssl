@@ -123,3 +123,4 @@ class OpensslConan(ConanFile):
             self.cpp_info.libs = ["ssl", "crypto", "dl", "pthread"]
         elif self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
             self.cpp_info.libs = ["libssl", "libcrypto", "crypt32", "msi", "ws2_32"]
+            self.cpp_info.defines = ["_CRT_SECURE_NO_WARNINGS"]
