@@ -43,7 +43,7 @@ class OpensslConan(ConanFile):
             self.build_requires("get_vcvars/[~=1.0]@%s/stable" % self.user)
             self.build_requires("find_sdk_winxp/[~=1.0]@%s/stable" % self.user)
         if get_safe(self.options, "dll_sign"):
-            self.build_requires("find_windows_signtool/[~=1.0]@%s/stable" % self.user)
+            self.build_requires("windows_signtool/[~=1.0]@%s/stable" % self.user)
         
     def build(self):
         build_options = []
@@ -108,14 +108,15 @@ class OpensslConan(ConanFile):
             self.copy("libssl-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
         # Sign DLL
         if get_safe(self.options, "dll_sign"):
-            with tools.pythonpath(self):
-                from find_windows_signtool import find_signtool
-                signtool = '"' + find_signtool(str(self.settings.arch)) + '"'
-                params =  "sign /a /t http://timestamp.verisign.com/scripts/timestamp.dll"
-                pattern = os.path.join(self.package_folder, "bin", "*.dll")
-                for fpath in glob.glob(pattern):
+            import windows_signtool
+            pattern = os.path.join(self.package_folder, "bin", "*.dll")
+            for fpath in glob.glob(pattern):
+                fpath = fpath.replace("\\", "/")
+                for alg in ["sha1", "sha256"]:
+                    is_timestamp = True if self.settings.build_type == "Release" else False
+                    cmd = windows_signtool.get_sign_command(fpath, digest_algorithm=alg, timestamp=is_timestamp)
                     self.output.info("Sign %s" % fpath)
-                    self.run("%s %s %s" %(signtool, params, fpath))
+                    self.run(cmd)
 
     def package_info(self):
         if self.settings.os == "Linux":
