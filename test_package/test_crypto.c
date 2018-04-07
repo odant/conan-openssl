@@ -14,6 +14,8 @@
 char password[16];
 char data[1024];
 
+void cleanUp(char*, EVP_CIPHER_CTX*, char*, EVP_CIPHER_CTX*);
+
 int main(int argc, char** argv) {
 
 #ifdef _WIN32
@@ -35,6 +37,11 @@ int main(int argc, char** argv) {
 
 /* Genarate key and initisl vector. Init cipher context. */
 
+    char* e_data = NULL;
+    char* d_data = NULL;
+    EVP_CIPHER_CTX* e_ctx = NULL;
+    EVP_CIPHER_CTX* d_ctx = NULL;
+
     int res;
 
     const int nrounds = 5;
@@ -45,7 +52,7 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    EVP_CIPHER_CTX* e_ctx = EVP_CIPHER_CTX_new();
+    e_ctx = EVP_CIPHER_CTX_new();
     if (e_ctx == NULL) {
         printf("Allocate encrypt context failed\n");
         exit(EXIT_FAILURE);
@@ -54,22 +61,21 @@ int main(int argc, char** argv) {
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
         printf("Init encrypt context failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
-        EVP_CIPHER_CTX_free(e_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
 
-    EVP_CIPHER_CTX* d_ctx = EVP_CIPHER_CTX_new();
+    d_ctx = EVP_CIPHER_CTX_new();
     if (e_ctx == NULL) {
         printf("Allocate decrypt context failed\n");
-        EVP_CIPHER_CTX_free(e_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
     res = EVP_DecryptInit_ex(d_ctx, EVP_aes_256_cbc(), NULL, key, iv);
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
         printf("Init decrypt context failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
-        EVP_CIPHER_CTX_free(e_ctx);
-        EVP_CIPHER_CTX_free(d_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
 
@@ -77,11 +83,10 @@ int main(int argc, char** argv) {
 /* Encrypt/decrypt */
 
     int e_data_len = sizeof(data) + AES_BLOCK_SIZE;
-    char* e_data = malloc(e_data_len);
+    e_data = malloc(e_data_len);
     if (e_data == NULL) {
         printf("Allocate buffer for encrypt data failed\n");
-        EVP_CIPHER_CTX_free(e_ctx);
-        EVP_CIPHER_CTX_free(d_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
 
@@ -89,9 +94,7 @@ int main(int argc, char** argv) {
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
         printf("EVP_EncryptUpdate() failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
-        free(e_data);
-        EVP_CIPHER_CTX_free(e_ctx);
-        EVP_CIPHER_CTX_free(d_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
     printf("EVP_EncryptUpdate() encrypted %d bytes\n", e_data_len);
@@ -101,9 +104,7 @@ int main(int argc, char** argv) {
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
         printf("EVP_EncryptFinal_ex() failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
-        free(e_data);
-        EVP_CIPHER_CTX_free(e_ctx);
-        EVP_CIPHER_CTX_free(d_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
     printf("EVP_EncryptFinal_ex() encrypted %d bytes\n", e_data_tail_len);
@@ -111,12 +112,10 @@ int main(int argc, char** argv) {
     printf("Amount encrypted %d bytes\n", e_data_len);
 
     int d_data_len = e_data_len;
-    char* d_data = malloc(d_data_len);
+    d_data = malloc(d_data_len);
     if (d_data == NULL) {
         printf("Allocate buffer for decrypt data failed\n");
-        free(e_data);
-        EVP_CIPHER_CTX_free(e_ctx);
-        EVP_CIPHER_CTX_free(d_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
 
@@ -124,10 +123,7 @@ int main(int argc, char** argv) {
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
         printf("EVP_DecryptUpdate() failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
-        free(e_data);
-        free(d_data);
-        EVP_CIPHER_CTX_free(e_ctx);
-        EVP_CIPHER_CTX_free(d_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
     printf("EVP_DecryptUpdate() decrypted %d bytes\n", d_data_len);
@@ -152,19 +148,13 @@ int main(int argc, char** argv) {
 
     if (d_data_len != sizeof(data)) {
         printf("Decrypted data length not equal source data length, d_data_len: %d, sizeof(data): %d\n", d_data_len, sizeof(data));
-        free(e_data);
-        free(d_data);
-        EVP_CIPHER_CTX_free(e_ctx);
-        EVP_CIPHER_CTX_free(d_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
 
     if (memcmp(data, d_data, sizeof(data)) != 0) {
         printf("Decrypted data not equal source data\n");
-        free(e_data);
-        free(d_data);
-        EVP_CIPHER_CTX_free(e_ctx);
-        EVP_CIPHER_CTX_free(d_ctx);
+        cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
 
@@ -173,11 +163,26 @@ int main(int argc, char** argv) {
 
 /* Clean */
 
-    free(e_data);
-    free(d_data);
-    EVP_CIPHER_CTX_free(e_ctx);
-    EVP_CIPHER_CTX_free(d_ctx);
-
+    cleanUp(e_data, e_ctx, d_data, d_ctx);
     return EXIT_SUCCESS;
 }
 
+void cleanUp(char* e_data, EVP_CIPHER_CTX* e_ctx, char* d_data, EVP_CIPHER_CTX* d_ctx) {
+
+    if (e_data != NULL) {
+        free(e_data);
+    }
+
+    if (e_ctx != NULL) {
+        EVP_CIPHER_CTX_free(e_ctx);
+    }
+
+    if (d_data != NULL) {
+        free(d_data);
+    }
+
+    if (d_ctx != NULL) {
+        EVP_CIPHER_CTX_free(d_ctx);
+    }
+
+}
