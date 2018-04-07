@@ -5,6 +5,7 @@
 
 #include <openssl/evp.h>
 #include <openssl/aes.h>
+#include <openssl/err.h>
 
 #ifdef _WIN32
 #include <openssl/applink.c>
@@ -22,9 +23,9 @@ int main(int argc, char** argv) {
     OPENSSL_Applink();
 #endif
 
-    printf("data length: %d bytes, password length: %d bytes\n", sizeof(data), sizeof(password));
+    printf("data length: %zd bytes, password length: %zd bytes\n", sizeof(data), sizeof(password));
 
-    srand(time(NULL));
+    srand((unsigned int) time(NULL));
 
     for (int i = 0; i < sizeof(password); i++) {
         password[i] = (char) rand();
@@ -147,7 +148,7 @@ int main(int argc, char** argv) {
 /* Compare */
 
     if (d_data_len != sizeof(data)) {
-        printf("Decrypted data length not equal source data length, d_data_len: %d, sizeof(data): %d\n", d_data_len, sizeof(data));
+        printf("Decrypted data length not equal source data length, d_data_len: %d, sizeof(data): %zd\n", d_data_len, sizeof(data));
         cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
