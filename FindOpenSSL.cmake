@@ -92,6 +92,9 @@ find_package_handle_standard_args(OpenSSL
 
 if(OPENSSL_FOUND)
 
+    include(CMakeFindDependencyMacro)
+    find_dependency(Threads)
+  
     if(NOT TARGET OpenSSL::Crypto)
         add_library(OpenSSL::Crypto UNKNOWN IMPORTED)
         set_target_properties(OpenSSL::Crypto PROPERTIES
@@ -99,8 +102,16 @@ if(OPENSSL_FOUND)
             IMPORTED_LINK_INTERFACE_LANGUAGES "C"
             IMPORTED_LOCATION "${OPENSSL_CRYPTO_LIBRARY}"
             INTERFACE_COMPILE_DEFINITIONS "${CONAN_COMPILE_DEFINITIONS_OPENSSL}"
+            INTERFACE_LINK_LIBRARIES Threads::Threads
         )
     endif()
+    
+    if(WIN32)
+        set_property(TARGET OpenSSL::Crypto
+            APPEND PROPERTY INTERFACE_LINK_LIBRARIES "crypt32" "ws2_32"
+        )
+    endif()
+
     
     if(NOT TARGET OpenSSL::SSL)
         add_library(OpenSSL::SSL UNKNOWN IMPORTED)
