@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     res = EVP_EncryptInit_ex(e_ctx, EVP_aes_256_cbc(), NULL, key, iv);
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
-        printf("Init encrypt context failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
+        printf("Init encrypt context failed, code: %ld, error: %s\n", err_code, ERR_error_string(err_code, NULL));
         cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
     res = EVP_DecryptInit_ex(d_ctx, EVP_aes_256_cbc(), NULL, key, iv);
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
-        printf("Init decrypt context failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
+        printf("Init decrypt context failed, code: %ld, error: %s\n", err_code, ERR_error_string(err_code, NULL));
         cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
     res = EVP_EncryptUpdate(e_ctx, e_data, &e_data_len, data, sizeof(data));
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
-        printf("EVP_EncryptUpdate() failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
+        printf("EVP_EncryptUpdate() failed, code: %ld, error: %s\n", err_code, ERR_error_string(err_code, NULL));
         cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
     res = EVP_EncryptFinal_ex(e_ctx, e_data + e_data_len, &e_data_tail_len);
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
-        printf("EVP_EncryptFinal_ex() failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
+        printf("EVP_EncryptFinal_ex() failed, code: %ld, error: %s\n", err_code, ERR_error_string(err_code, NULL));
         cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
     res = EVP_DecryptUpdate(d_ctx, d_data, &d_data_len, e_data, e_data_len);
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
-        printf("EVP_DecryptUpdate() failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
+        printf("EVP_DecryptUpdate() failed, code: %ld, error: %s\n", err_code, ERR_error_string(err_code, NULL));
         cleanUp(e_data, e_ctx, d_data, d_ctx);
         exit(EXIT_FAILURE);
     }
@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
     res = EVP_DecryptFinal_ex(d_ctx, d_data + d_data_len, &d_data_tail_len);
     if (res == 0) {
         unsigned long err_code = ERR_get_error();
-        printf("EVP_DecryptFinal_ex() failed, code: %d, error: %s\n", err_code, ERR_error_string(err_code, NULL));
+        printf("EVP_DecryptFinal_ex() failed, code: %ld, error: %s\n", err_code, ERR_error_string(err_code, NULL));
         free(e_data);
         free(d_data);
         EVP_CIPHER_CTX_free(e_ctx);
