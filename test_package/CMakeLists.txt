@@ -38,3 +38,16 @@ add_test(
     COMMAND test_openssl
 )
 
+add_executable(test_crypto test_crypto.c)
+target_link_libraries(test_crypto OpenSSL::Crypto)
+set_target_properties(test_crypto
+    PROPERTIES
+    INSTALL_RPATH "$ORIGIN"
+    BUILD_WITH_INSTALL_RPATH True
+)
+add_test(
+    NAME test_crypto
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    COMMAND test_crypto
+)
+
