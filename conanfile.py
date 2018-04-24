@@ -21,7 +21,7 @@ class OpensslConan(ConanFile):
         "os": ["Windows", "Linux"],
         "compiler": ["Visual Studio", "gcc"],
         "build_type": ["Debug", "Release"],
-        "arch": ["x86_64", "x86"]
+        "arch": ["x86_64", "x86", "mips"]
     }
     options = {"shared": [False, True], "dll_sign": [False, True]}
     default_options = "shared=True", "dll_sign=True"
@@ -67,7 +67,11 @@ class OpensslConan(ConanFile):
         
     def unix_build(self, build_options):
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
-        target = "linux-%s" % self.settings.arch
+        target = {
+            "x86": "linux-x86",
+            "x86_64": "linux-x86_64",
+            "mips": "linux-mips32"
+        }.get(str(self.settings.arch))
         self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
         self.run("make build_libs -j %s" % tools.cpu_count())
         
