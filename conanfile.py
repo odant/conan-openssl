@@ -82,7 +82,7 @@ class OpensslConan(ConanFile):
         else:
             target += "32"
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
-        env = tools.vcvars_dict(self.settings, filter_known_paths=False)
+        env = tools.vcvars_dict(self.settings, filter_known_paths=False, force=True)
         toolset = str(self.settings.compiler.get_safe("toolset"))
         if toolset.endswith("_xp"):
             import find_sdk_winxp
