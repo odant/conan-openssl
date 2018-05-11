@@ -1,10 +1,17 @@
+# Test for OpenSSL Conan package
+# Dmitriy Vetutnev, Odant 2018
+
+
 project(PackageTest C)
 cmake_minimum_required(VERSION 3.0)
+
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
+
 enable_testing()
+
 
 # CONAN_PKG::openssl imported targets
 
@@ -20,6 +27,7 @@ add_test(
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
     COMMAND test_openssl_CONAN_PKG
 )
+
 
 # Normal imported targets
 

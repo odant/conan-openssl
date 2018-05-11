@@ -1,3 +1,7 @@
+// Test for OpenSSL Conan package
+// Dmitriy Vetutnev, Odant 2018
+
+
 #include <stdlib.h>
 
 
