@@ -12,7 +12,7 @@ def get_safe(options, name):
 
 class OpensslConan(ConanFile):
     name = "openssl"
-    version = "1.1.0g"
+    version = "1.1.0h"
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
                   "toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
@@ -45,7 +45,7 @@ class OpensslConan(ConanFile):
                 self.build_requires("find_sdk_winxp/[~=1.0]@%s/stable" % self.user)
         if get_safe(self.options, "dll_sign"):
             self.build_requires("windows_signtool/[~=1.0]@%s/stable" % self.user)
-        
+            
     def build(self):
         build_options = []
         build_options.append("threads")
@@ -77,23 +77,29 @@ class OpensslConan(ConanFile):
         self.run("make build_libs -j %s" % tools.cpu_count())
         
     def msvc_build(self, build_options):
+        toolset = str(self.settings.compiler.get_safe("toolset"))
+        if not toolset.endswith("_xp"):
+            build_options.append("-D_WIN32_WINNT=0x0601") # Windows 7 and Windows Server 2008 R2 minimal target
+        #
         target = "VC-WIN"
         if self.settings.arch == "x86_64":
             target += "64A"
         else:
             target += "32"
+        #
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
         env = tools.vcvars_dict(self.settings, filter_known_paths=False)
-        toolset = str(self.settings.compiler.get_safe("toolset"))
         if toolset.endswith("_xp"):
             import find_sdk_winxp
             env = find_sdk_winxp.dict_append(self.settings.arch, env=env)
+        else:
+            env["LINK"] = "/subsystem:console,6.01"
         # Run build
         with tools.environment_append(env):
             self.run("set")
             self.run("perl --version")
             self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
-            self.run("nmake build_libs")
+            self.run("nmake build_libs") # Windows 7 and Windows Server 2008 R2 minimal target
         
     def package(self):
         self.copy("FindOpenSSL.cmake", src=".", dst=".")
