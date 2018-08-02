@@ -8,7 +8,7 @@ environment:
 
   CONAN_DISABLE_DLL_SIGN: 1
 
-  CONAN_REFERENCE: openssl/1.1.0g
+  CONAN_REFERENCE: openssl/1.1.0h
   CONAN_USERNAME: odant
   CONAN_CHANNEL: testing
   CONAN_STABLE_CHANNEL: stable
