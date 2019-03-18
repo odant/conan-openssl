@@ -1,3 +1,9 @@
+/* 
+ * Test for OpenSSL Conan package
+ * Dmitriy Vetutnev, ODANT, 2018-2019
+*/
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>

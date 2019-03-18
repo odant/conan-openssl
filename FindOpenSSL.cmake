@@ -1,3 +1,7 @@
+# OpenSSL Conan package
+# Dmitriy Vetutnev, ODANT, 2018-2019
+
+
 set(OPENSSL_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_OPENSSL})
 
 function(from_hex HEX DEC)

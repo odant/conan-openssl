@@ -1,3 +1,7 @@
+# OpenSSL Conan package
+# Dmitriy Vetutnev, ODANT, 2018-2019
+
+
 from conans import ConanFile, tools
 from conans.errors import ConanException
 import os, glob

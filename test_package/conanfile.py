@@ -1,3 +1,7 @@
+# Test for OpenSSL Conan package
+# Dmitriy Vetutnev, ODANT, 2018-2019
+
+
 from conans import ConanFile, CMake
 
 
@@ -6,7 +10,7 @@ class PackageTestConan(ConanFile):
     generators = "cmake"
 
     def build(self):
-        cmake = CMake(self)
+        cmake = CMake(self, msbuild_verbosity="normal")
         cmake.verbose = True
         cmake.configure()
         cmake.build()

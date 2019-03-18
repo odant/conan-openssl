@@ -1,3 +1,7 @@
+# Test for OpenSSL Conan package
+# Dmitriy Vetutnev, ODANT, 2018-2019
+
+
 project(PackageTest C)
 cmake_minimum_required(VERSION 3.0)
 

@@ -1,3 +1,7 @@
+# OpenSSL Conan package
+# Dmitriy Vetutnev, ODANT, 2018-2019
+
+
 import platform, os
 from copy import deepcopy
 from conan.packager import ConanMultiPackager

@@ -1,5 +1,10 @@
-#include <stdlib.h>
+/* 
+ * Test for OpenSSL Conan package
+ * Dmitriy Vetutnev, ODANT, 2018-2019
+*/
 
+
+#include <stdlib.h>
 
 #include <openssl/crypto.h>
 
