@@ -102,7 +102,13 @@ if(OPENSSL_FOUND)
             IMPORTED_LINK_INTERFACE_LANGUAGES "C"
             IMPORTED_LOCATION "${OPENSSL_CRYPTO_LIBRARY}"
             INTERFACE_COMPILE_DEFINITIONS "${CONAN_COMPILE_DEFINITIONS_OPENSSL}"
-            INTERFACE_LINK_LIBRARIES Threads::Threads ${CMAKE_DL_LIBS}
+            INTERFACE_LINK_LIBRARIES Threads::Threads
+        )
+    endif()
+
+    if(UNIX)
+        set_property(TARGET OpenSSL::Crypto
+            APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${CMAKE_DL_LIBS}
         )
     endif()
 
