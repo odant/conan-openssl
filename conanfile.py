@@ -60,13 +60,21 @@ class OpensslConan(ConanFile):
         build_options.append("threads")
         build_options.append("no-comp")
         build_options.append("no-dynamic-engine") # Include ingines standard in libcrypto
-        if self.options.with_unit_tests:
-            build_options.append("enable-unit-test")
-        if self.settings.build_type == "Debug":
-            build_options.append("no-asm")
+        #
         if not self.options.shared:
             build_options.append("no-shared")
-        build_options.append("--%s" % str(self.settings.build_type).lower())
+        #
+        if self.options.with_unit_tests:
+            build_options.append("enable-unit-test")
+        else:
+            build_options.append("no-tests")
+        #
+        if self.settings.build_type == "Debug":
+            build_options.append("no-asm")
+            build_options.append("--debug")
+        else:
+            build_options.append("--release")
+        #
         self.output.info("--------------Start build--------------")
         if self.settings.os == "Linux":
             self.unix_build(build_options)
@@ -82,9 +90,9 @@ class OpensslConan(ConanFile):
             "mips": "linux-mips32"
         }.get(str(self.settings.arch))
         self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
-        self.run("make -j %s" % tools.cpu_count())
+        self.run("make build_libs -j %s" % tools.cpu_count())
         if self.options.with_unit_tests:
-            self.run("make test")
+            self.run("make test -j %s" % tools.cpu_count())
 
     def msvc_build(self, build_options):
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
@@ -99,7 +107,7 @@ class OpensslConan(ConanFile):
         with tools.environment_append(env):
             self.run("perl --version")
             self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
-            self.run("nmake") 
+            self.run("nmake build_libs")
             if self.options.with_unit_tests:
                 self.run("nmake test")
 
