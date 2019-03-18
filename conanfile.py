@@ -29,7 +29,7 @@ class OpensslConan(ConanFile):
         "with_unit_tests": [False, True],
     }
     default_options = "shared=True", "dll_sign=True", "with_unit_tests=False"
-    exports_sources = "src/*", "FindOpenSSL.cmake"
+    exports_sources = "src/*", "FindOpenSSL.cmake", "build.patch"
     no_copy_source = True
     build_policy = "missing"
 
@@ -51,11 +51,15 @@ class OpensslConan(ConanFile):
         if get_safe(self.options, "dll_sign"):
             self.build_requires("windows_signtool/[~=1.0]@%s/stable" % self.user)
 
+    def source(self):
+        tools.patch(patch_file="build.patch")
+
     def build(self):
         build_options = []
         build_options.append("--api=1.1.0")
         build_options.append("threads")
         build_options.append("no-comp")
+        build_options.append("no-dynamic-engine") # Include ingines standard in libcrypto
         if self.options.with_unit_tests:
             build_options.append("enable-unit-test")
         if self.settings.build_type == "Debug":
