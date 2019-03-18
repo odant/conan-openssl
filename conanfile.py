@@ -12,7 +12,7 @@ def get_safe(options, name):
 
 class OpensslConan(ConanFile):
     name = "openssl"
-    version = "1.1.0h"
+    version = "1.1.1b"
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
                   "toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
@@ -23,37 +23,41 @@ class OpensslConan(ConanFile):
         "build_type": ["Debug", "Release"],
         "arch": ["x86_64", "x86", "mips"]
     }
-    options = {"shared": [False, True], "dll_sign": [False, True]}
-    default_options = "shared=True", "dll_sign=True"
+    options = {
+        "shared": [False, True],
+        "dll_sign": [False, True],
+        "with_unit_tests": [False, True],
+    }
+    default_options = "shared=True", "dll_sign=True", "with_unit_tests=False"
     exports_sources = "src/*", "FindOpenSSL.cmake"
     no_copy_source = True
     build_policy = "missing"
-        
+
     def configure(self):
         # DLL sign
         if self.settings.os != "Windows" or not self.options.shared:
             del self.options.dll_sign
         # Pure C library
         del self.settings.compiler.libcxx
+        # Disable Windows XP support
+        if self.settings.os == "Windows":
+            if not self.settings.compiler.get_safe("toolset") in [None, "'v141'"]:
+                raise ConanException("This package is compatible with compiler toolset None or v141")
 
     def build_requirements(self):
         if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             self.build_requires("nasm/2.13.01@conan/stable")
-            toolset = str(self.settings.compiler.get_safe("toolset"))
-            if toolset.endswith("_xp"):
-                self.build_requires("find_sdk_winxp/[~=1.0]@%s/stable" % self.user)
         if get_safe(self.options, "dll_sign"):
             self.build_requires("windows_signtool/[~=1.0]@%s/stable" % self.user)
-            
+
     def build(self):
         build_options = []
+        build_options.append("--api=1.1.0")
         build_options.append("threads")
         build_options.append("no-comp")
-        build_options.append("no-unit-test")
-        build_options.append("no-hw")
-        build_options.append("no-dso")
-        build_options.append("no-dynamic-engine")
+        if self.options.with_unit_tests:
+            build_options.append("enable-unit-test")
         if self.settings.build_type == "Debug":
             build_options.append("no-asm")
         if not self.options.shared:
@@ -65,7 +69,7 @@ class OpensslConan(ConanFile):
         elif self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
             self.msvc_build(build_options)
         self.output.info("--------------Build done---------------")
-        
+
     def unix_build(self, build_options):
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
         target = {
@@ -74,33 +78,27 @@ class OpensslConan(ConanFile):
             "mips": "linux-mips32"
         }.get(str(self.settings.arch))
         self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
-        self.run("make build_libs -j %s" % tools.cpu_count())
-        
+        self.run("make -j %s" % tools.cpu_count())
+        if self.options.with_unit_tests:
+            self.run("make test")
+
     def msvc_build(self, build_options):
-        toolset = str(self.settings.compiler.get_safe("toolset"))
-        if not toolset.endswith("_xp"):
-            build_options.append("-D_WIN32_WINNT=0x0601") # Windows 7 and Windows Server 2008 R2 minimal target
-        #
-        target = "VC-WIN"
-        if self.settings.arch == "x86_64":
-            target += "64A"
-        else:
-            target += "32"
-        #
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
+        build_options.append("-D_WIN32_WINNT=0x0601") # Windows 7 and Windows Server 2008 R2 minimal target
+        target = {
+            "x86": "VC-WIN32",
+            "x86_64": "VC-WIN64A"
+        }.get(str(self.settings.arch))
         env = tools.vcvars_dict(self.settings, filter_known_paths=False)
-        if toolset.endswith("_xp"):
-            import find_sdk_winxp
-            env = find_sdk_winxp.dict_append(self.settings.arch, env=env)
-        else:
-            env["LINK"] = "/subsystem:console,6.01"
+        env["LINK"] = "/subsystem:console,6.01" # Windows 7 and Windows Server 2008 R2 minimal target
         # Run build
         with tools.environment_append(env):
-            self.run("set")
             self.run("perl --version")
             self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
-            self.run("nmake build_libs") # Windows 7 and Windows Server 2008 R2 minimal target
-        
+            self.run("nmake") 
+            if self.options.with_unit_tests:
+                self.run("nmake test")
+
     def package(self):
         self.copy("FindOpenSSL.cmake", src=".", dst=".")
         self.copy("*.h", src="src/include/openssl", dst="include/openssl", keep_path=False)
@@ -128,6 +126,9 @@ class OpensslConan(ConanFile):
                     cmd = windows_signtool.get_sign_command(fpath, digest_algorithm=alg, timestamp=is_timestamp)
                     self.output.info("Sign %s" % fpath)
                     self.run(cmd)
+
+    def package_id(self):
+        self.info.options.with_unit_tests = "any"
 
     def package_info(self):
         if self.settings.os == "Linux":
