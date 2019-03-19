@@ -13,8 +13,6 @@ environment:
   CONAN_CHANNEL: testing
   CONAN_STABLE_CHANNEL: stable
 
-  CONAN_VISUAL_RUNTIMES: MDd, MD
-
   CONAN_UPLOAD: https://conan.kysa.me
   CONAN_LOGIN_USERNAME: appveyor
   CONAN_STABLE_BRANCH_PATTERN: release/*
@@ -24,10 +22,22 @@ environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       CONAN_VISUAL_VERSIONS: 15
+      CONAN_VISUAL_RUNTIMES: MD
       CONAN_ARCHS: x86_64
 
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       CONAN_VISUAL_VERSIONS: 15
+      CONAN_VISUAL_RUNTIMES: MD
+      CONAN_ARCHS: x86
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CONAN_VISUAL_VERSIONS: 15
+      CONAN_VISUAL_RUNTIMES: MDd
+      CONAN_ARCHS: x86_64
+
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CONAN_VISUAL_VERSIONS: 15
+      CONAN_VISUAL_RUNTIMES: MDd
       CONAN_ARCHS: x86
 
 install:
@@ -35,7 +45,7 @@ install:
   - pip install conan
   - pip install conan_package_tools
 
-  - conan user
+  - conan --version
 
 build: false
 
