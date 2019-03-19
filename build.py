@@ -42,7 +42,7 @@ if __name__ == "__main__":
         visual_runtimes=visual_runtimes,
         exclude_vcvars_precommand=True
     )
-    builder.add_common_builds(pure_c=True, shared_option_name="openssl:shared")
+    builder.add_common_builds(pure_c=True, shared_option_name=False)
     # Adjusting build configurations
     builds = builder.items
     if platform.system() == "Windows":
