@@ -20,8 +20,8 @@ def add_dll_sign(builds):
     result = []
     for settings, options, env_vars, build_requires, reference in builds:
         options = deepcopy(options)
-        # Only for shared
-        if options["openssl:shared"]:
+        # Only for shared (shared is default)
+        if options.get("openssl:shared", True):
             options["openssl:dll_sign"] = dll_sign
         result.append([settings, options, env_vars, build_requires, reference])
     return result
