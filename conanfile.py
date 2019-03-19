@@ -3,7 +3,6 @@
 
 
 from conans import ConanFile, tools
-from conans.errors import ConanException
 import os, glob
 
 
@@ -44,9 +43,9 @@ class OpensslConan(ConanFile):
         # Pure C library
         del self.settings.compiler.libcxx
         # Disable Windows XP support
-        if self.settings.os == "Windows":
-            if not self.settings.compiler.get_safe("toolset") in [None, "'v141'"]:
-                raise ConanException("This package is compatible with compiler toolset None or v141")
+        toolset = str(self.settings.compiler.get_safe("toolset"))
+        if toolset.endswith("_xp"):
+            raise Exception("This package is not compatible Windows XP")
 
     def build_requirements(self):
         if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
