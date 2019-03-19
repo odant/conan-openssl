@@ -55,3 +55,11 @@ add_test(
     COMMAND test_crypto
 )
 
+# Test application
+
+add_test(
+    NAME "\"Application OpenSSL\""
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    COMMAND openssl version
+)
+

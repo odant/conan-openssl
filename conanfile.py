@@ -87,6 +87,8 @@ class OpensslConan(ConanFile):
 
     def unix_build(self, build_options):
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
+        if self.options.shared:
+            build_options.append("-Wl,-rpath,'\\$$ORIGIN'")
         target = {
             "x86": "linux-x86",
             "x86_64": "linux-x86_64",
@@ -94,6 +96,7 @@ class OpensslConan(ConanFile):
         }.get(str(self.settings.arch))
         self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
         self.run("make build_libs -j %s" % tools.cpu_count())
+        self.run("make apps/openssl -j %s" % tools.cpu_count())
         if self.options.with_unit_tests:
             self.run("make test -j %s" % tools.cpu_count())
 
@@ -111,6 +114,7 @@ class OpensslConan(ConanFile):
             self.run("perl --version")
             self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
             self.run("nmake build_libs")
+            self.run("nmake apps/openssl")
             if self.options.with_unit_tests:
                 self.run("nmake test")
 
@@ -130,11 +134,15 @@ class OpensslConan(ConanFile):
             self.copy("libssl-*.dll", src=self.build_folder, dst="bin", keep_path=False)
             self.copy("libcrypto-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
             self.copy("libssl-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
+        # Pack application
+        self.copy("openssl", dst="bin", src="apps", keep_path=False)
+        self.copy("openssl.exe", dst="bin", src="apps", keep_path=False)
         # Sign DLL
         if get_safe(self.options, "dll_sign"):
             import windows_signtool
-            pattern = os.path.join(self.package_folder, "bin", "*.dll")
-            for fpath in glob.glob(pattern):
+            patternDLL = os.path.join(self.package_folder, "bin", "*.dll")
+            patternEXE = os.path.join(self.package_folder, "bin", "*.exe")
+            for fpath in (glob.glob(patternDLL) + glob.glob(patternEXE)):
                 fpath = fpath.replace("\\", "/")
                 for alg in ["sha1", "sha256"]:
                     is_timestamp = True if self.settings.build_type == "Release" else False
