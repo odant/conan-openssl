@@ -28,7 +28,7 @@ def add_with_unit_tests(builds):
     result = []
     for settings, options, env_vars, build_requires, reference in builds:
         options = deepcopy(options)
-        options["network-uri:with_unit_tests"] = with_unit_tests
+        options["openssl:with_unit_tests"] = with_unit_tests
         result.append([settings, options, env_vars, build_requires, reference])
     return result
 
