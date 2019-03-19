@@ -60,7 +60,6 @@ class OpensslConan(ConanFile):
 
     def build(self):
         build_options = []
-        build_options.append("--api=1.1.0")
         build_options.append("threads")
         build_options.append("no-comp")
         build_options.append("no-dynamic-engine") # Include ingines standard in libcrypto
