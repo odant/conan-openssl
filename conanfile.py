@@ -97,7 +97,7 @@ class OpensslConan(ConanFile):
         self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
         self.run("make -j %s" % tools.cpu_count())
         if self.options.with_unit_tests:
-            self.run("make test)
+            self.run("make test")
 
     def msvc_build(self, build_options):
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
