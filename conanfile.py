@@ -95,10 +95,9 @@ class OpensslConan(ConanFile):
             "mips": "linux-mips32"
         }.get(str(self.settings.arch))
         self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
-        self.run("make build_libs -j %s" % tools.cpu_count())
-        self.run("make apps/openssl -j %s" % tools.cpu_count())
+        self.run("make -j %s" % tools.cpu_count())
         if self.options.with_unit_tests:
-            self.run("make test -j %s" % tools.cpu_count())
+            self.run("make test)
 
     def msvc_build(self, build_options):
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
@@ -113,8 +112,7 @@ class OpensslConan(ConanFile):
         with tools.environment_append(env):
             self.run("perl --version")
             self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
-            self.run("nmake build_libs")
-            self.run("nmake apps/openssl")
+            self.run("nmake")
             if self.options.with_unit_tests:
                 self.run("nmake test")
 
