@@ -3,7 +3,7 @@
 
 
 project(PackageTest C)
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
@@ -62,4 +62,8 @@ add_test(
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
     COMMAND openssl version
 )
+
+# Tests engine
+
+add_subdirectory(engine)
 
