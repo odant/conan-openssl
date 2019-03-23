@@ -8,10 +8,8 @@ cmake_minimum_required(VERSION 3.5)
 
 # Dummy engine
 
-add_library(external_dummy_engine SHARED 
-    dummy.c
-)
-target_include_directories(external_dummy_engine PRIVATE ${OPENSSL_INCLUDE_DIRS})
+add_library(external_dummy_engine SHARED dummy.c)
+target_link_libraries(external_dummy_engine OpenSSL::Crypto)
 
 add_test(
     NAME "\"Command-line load external dummy engine\""
