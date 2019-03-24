@@ -36,6 +36,7 @@ static int fakerandBytes(unsigned char* buffer, int length) {
     return length;
 }
 
+
 static RAND_METHOD randMethod = {
     NULL,                       /* seed */
     fakerandBytes,
@@ -53,20 +54,26 @@ static const char* engineName = "A fake random generator engine. Generate monoto
 static int fakerandBind(ENGINE* e, const char* id) {
     printf("Called fakerandBind\n");
 
+    static int loaded = 0;
+    if (loaded) {
+        fprintf(stderr, "dummy engine already loaded\n");
+        return 0;
+    }
+
     if (!ENGINE_set_id(e, engineID)) {
-        printf("ENGINE_set_id failed\n");
+        fprintf(stderr, "ENGINE_set_id failed\n");
         return 0;
     }
     if (!ENGINE_set_name(e, engineName)) {
-        printf("ENGINE_set_name failed\n");
+        fprintf(stderr, "ENGINE_set_name failed\n");
         return 0;
     }
     if (!ENGINE_set_RAND(e, &randMethod)) {
-        printf("ENGINE_set_RAND failed\n");
+        fprintf(stderr, "ENGINE_set_RAND failed\n");
         return 0;
     }
     if (!ENGINE_set_default(e, ENGINE_METHOD_RAND)) {
-        printf("ENGINE_set_default(e, ENGINE_METHOD_RAND failed\n");
+        fprintf(stderr, "ENGINE_set_default(e, ENGINE_METHOD_RAND failed\n");
         return 0;
     }
 
