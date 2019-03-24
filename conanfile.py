@@ -61,9 +61,9 @@ class OpensslConan(ConanFile):
     def build(self):
         build_options = []
         build_options.append("threads")
-        build_options.append("no-comp") # Disable ZLIB
+        build_options.append("no-comp") # Disable ZLIB (possible CRIME attack)
         build_options.append("enable-engine")
-        build_options.append("no-dynamic-engine")
+        build_options.append("no-dynamic-engine") # Insert standard engines (from OpenSSL sources) into crypto library
         build_options.append("no-autoload-config")
         #
         if not self.options.shared:
