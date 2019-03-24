@@ -7,7 +7,6 @@
 
 #include <openssl/conf.h>
 #include <openssl/err.h>
-#include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <openssl/engine.h>
 
@@ -54,7 +53,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "OpenSSL config: " << argv[1] << std::endl;
     if (::CONF_modules_load_file(argv[1], "openssl_conf", 0) <= 0) {
-        std::cerr << "Failed load config" << std::endl;
+        std::cerr << "CONF_modules_load_file failed" << std::endl;
         const char* filename;
         int line;
         ::ERR_get_error_line(&filename, &line);
@@ -69,7 +68,18 @@ int main(int argc, char* argv[]) {
     const std::vector<unsigned char> normalResult = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned char> result = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    RAND_bytes(result.data(), result.size());
+    if (!RAND_bytes(result.data(), result.size())) {
+        std::cerr << "RAND_bytes failed" << std::endl;
+        const char* filename;
+        int line;
+        ::ERR_get_error_line(&filename, &line);
+        std::cerr << filename << ':' << line << std::endl;
+        const auto e = ::ERR_get_error();
+        char str[4096];
+        ::ERR_error_string_n(e, str, sizeof(str));
+        std::cerr << str << std::endl;
+        return EXIT_FAILURE;
+    }
 
     std::cout << "normalResult:" << std::endl << normalResult << std::endl;
     std::cout << "result:" << std::endl << result << std::endl;
