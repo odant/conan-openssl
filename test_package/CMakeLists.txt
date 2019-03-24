@@ -60,7 +60,7 @@ add_test(
 add_test(
     NAME "\"Application OpenSSL\""
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-    COMMAND openssl version
+    COMMAND ${CMAKE_BINARY_DIR}/bin/openssl version
 )
 
 # Tests engine
