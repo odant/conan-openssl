@@ -1,0 +1,12 @@
+openssl_conf = openssl_init
+
+[openssl_init]
+engines = engine_section
+
+[engine_section]
+fakerand = fakerand_section
+
+[fakerand_section]
+engine_id = fakerand
+dynamic_path = ${FAKERAND_PATH}
+

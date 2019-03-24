@@ -61,8 +61,10 @@ class OpensslConan(ConanFile):
     def build(self):
         build_options = []
         build_options.append("threads")
-        build_options.append("no-comp")
-        build_options.append("no-dynamic-engine") # Include ingines standard in libcrypto
+        build_options.append("no-comp") # Disable ZLIB
+        build_options.append("enable-engine")
+        build_options.append("no-dynamic-engine")
+        build_options.append("no-autoload-config")
         #
         if not self.options.shared:
             build_options.append("no-shared")

@@ -2,7 +2,7 @@
 # Dmitriy Vetutnev, ODANT, 2018-2019
 
 
-project(EngineTest C)
+project(EngineTest C CXX)
 cmake_minimum_required(VERSION 3.5)
 
 
@@ -26,5 +26,33 @@ add_test(
     NAME "\"Command-line load external fake random engine\""
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
     COMMAND ${CMAKE_BINARY_DIR}/bin/openssl rand -engine $<TARGET_FILE:external_fakerand_engine> -hex 10
+)
+
+# Load fake random generator engine through openssl.conf
+
+if(UNIX)
+    set(FAKERAND_PATH ${CMAKE_BINARY_DIR}/bin/libexternal_fakerand_engine.so)
+else()
+    set(FAKERAND_PATH ${CMAKE_BINARY_DIR}/bin/external_fakerand_engine.dll)
+endif()
+configure_file(
+    fakerand_openssl.conf.in
+    ${CMAKE_BINARY_DIR}/bin/fakerand_openssl.conf
+    ESCAPE_QUOTES
+)
+
+add_executable(test_load_engine test_load_engine.cpp)
+target_link_libraries(test_load_engine OpenSSL::Crypto)
+set_target_properties(test_load_engine
+    PROPERTIES
+    INSTALL_RPATH "$ORIGIN"
+    BUILD_WITH_INSTALL_RPATH True
+)
+add_dependencies(test_load_engine external_fakerand_engine)
+
+add_test(
+    NAME test_load_engine
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    COMMAND test_load_engine ${CMAKE_BINARY_DIR}/bin/fakerand_openssl.conf
 )
 
