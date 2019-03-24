@@ -20,6 +20,7 @@ static int bind(ENGINE* e, const char* id) {
     static int loaded = 0;
     if (loaded) {
         fprintf(stderr, "dummy engine already loaded\n");
+        return 0;
     }
 
     if (!ENGINE_set_id(e, engineID)) {
