@@ -8,32 +8,32 @@ cmake_minimum_required(VERSION 3.5)
 
 # Dummy engine
 
-add_library(external_dummy_engine SHARED dummy.c)
-target_link_libraries(external_dummy_engine OpenSSL::Crypto)
+add_library(dummy_engine SHARED dummy.c)
+target_link_libraries(dummy_engine OpenSSL::Crypto)
 
 add_test(
     NAME "\"Command-line load external dummy engine\""
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-    COMMAND ${CMAKE_BINARY_DIR}/bin/openssl engine -t -tt -vvvv -c $<TARGET_FILE:external_dummy_engine>
+    COMMAND ${CMAKE_BINARY_DIR}/bin/openssl engine -t -tt -vvvv -c $<TARGET_FILE:dummy_engine>
 )
 
 # Fake random generator engine
 
-add_library(external_fakerand_engine SHARED fakerand.c)
-target_link_libraries(external_fakerand_engine OpenSSL::Crypto)
+add_library(fakerand_engine SHARED fakerand.c)
+target_link_libraries(fakerand_engine OpenSSL::Crypto)
 
 add_test(
     NAME "\"Command-line load external fake random engine\""
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-    COMMAND ${CMAKE_BINARY_DIR}/bin/openssl rand -engine $<TARGET_FILE:external_fakerand_engine> -hex 10
+    COMMAND ${CMAKE_BINARY_DIR}/bin/openssl rand -engine $<TARGET_FILE:fakerand_engine> -hex 10
 )
 
 # Load fake random generator engine through openssl.conf
 
 if(UNIX)
-    set(FAKERAND_PATH ${CMAKE_BINARY_DIR}/bin/libexternal_fakerand_engine.so)
+    set(FAKERAND_PATH ${CMAKE_BINARY_DIR}/bin/libfakerand_engine.so)
 else()
-    set(FAKERAND_PATH ${CMAKE_BINARY_DIR}/bin/external_fakerand_engine.dll)
+    set(FAKERAND_PATH ${CMAKE_BINARY_DIR}/bin/fakerand_engine.dll)
 endif()
 configure_file(
     fakerand_openssl.conf.in
@@ -48,7 +48,7 @@ set_target_properties(test_load_engine
     INSTALL_RPATH "$ORIGIN"
     BUILD_WITH_INSTALL_RPATH True
 )
-add_dependencies(test_load_engine external_fakerand_engine)
+add_dependencies(test_load_engine fakerand_engine)
 
 add_test(
     NAME test_load_engine
