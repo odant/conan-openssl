@@ -12,20 +12,26 @@
 #include <openssl/engine.h>
 
 
-static const char* engine_id = "dummy";
-static const char* engine_name = "A dummy engine for demonstration purposes";
+static const char* engineID = "dummy";
+static const char* engineName = "A dummy engine for demonstration purposes";
 
 
 static int bind(ENGINE* e, const char* id) {
-    if (!ENGINE_set_id(e, engine_id)) {
-        printf("ENGINE_set_id failed\n");
+    static int loaded = 0;
+    if (loaded) {
+        fprintf(stderr, "dummy engine already loaded\n");
+    }
+
+    if (!ENGINE_set_id(e, engineID)) {
+        fprintf(stderr, "ENGINE_set_id failed\n");
         return 0;
     }
-    if (!ENGINE_set_name(e, engine_name)) {
-        printf("ENGINE_set_name failed\n");
+    if (!ENGINE_set_name(e, engineName)) {
+        fprintf(stderr, "ENGINE_set_name failed\n");
         return 0;
     }
 
+    loaded = 1;
     return 1;
 }
 
