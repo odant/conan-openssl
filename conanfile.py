@@ -120,7 +120,7 @@ class OpensslConan(ConanFile):
 
     def package(self):
         self.copy("FindOpenSSL.cmake", src=".", dst=".")
-        self.copy("*.h", src="src/include/openssl", dst="include/openssl", keep_path=False)
+        self.copy("*.h", src="src/include/openssl", dst="include/openssl", keep_path=False, excludes="__DECC_INCLUDE_*")
         self.copy("*.h", src="include/openssl", dst="include/openssl", keep_path=False)
         if self.options.shared:
             self.copy("*.so*", dst="lib", keep_path=False, symlinks=True)
