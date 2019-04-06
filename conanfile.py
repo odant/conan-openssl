@@ -90,7 +90,7 @@ class OpensslConan(ConanFile):
     def unix_build(self, build_options):
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
         if self.options.shared:
-            build_options.append("-Wl,-rpath,'\\$$ORIGIN'")
+            build_options.append("-Wl,-rpath,'\\$$ORIGIN:\\$$ORIGIN/../lib'")
         target = {
             "x86": "linux-x86",
             "x86_64": "linux-x86_64",
