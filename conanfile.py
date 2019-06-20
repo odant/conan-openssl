@@ -43,10 +43,6 @@ class OpensslConan(ConanFile):
             del self.options.dll_sign
         # Pure C library
         del self.settings.compiler.libcxx
-        # Disable Windows XP support
-        toolset = str(self.settings.compiler.get_safe("toolset"))
-        if toolset.endswith("_xp"):
-            raise Exception("This package is not compatible Windows XP")
 
     def build_requirements(self):
         if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
