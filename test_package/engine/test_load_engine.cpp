@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
     const std::vector<unsigned char> normalResult = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<unsigned char> result = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    if (!RAND_bytes(result.data(), result.size())) {
+    if (!RAND_bytes(result.data(), static_cast<int>(result.size()))) {
         std::cerr << "RAND_bytes failed" << std::endl;
         const char* filename;
         int line;

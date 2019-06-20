@@ -2,7 +2,7 @@
 # Dmitriy Vetutnev, ODANT, 2018-2019
 
 
-project(PackageTest C)
+project(PackageTest C CXX)
 cmake_minimum_required(VERSION 3.5)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
