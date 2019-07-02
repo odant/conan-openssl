@@ -73,5 +73,5 @@ add_test(
 
 # Tests engine
 
-#add_subdirectory(engine)
+add_subdirectory(engine)
 
