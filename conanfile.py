@@ -67,8 +67,8 @@ class OpensslConan(ConanFile):
         #
         if self.options.with_unit_tests:
             build_options.append("enable-unit-test")
-        else:
-            build_options.append("no-tests")
+        #else:
+        #    build_options.append("no-tests")
         #
         if self.settings.build_type == "Debug":
             build_options.append("no-asm")
