@@ -1,8 +1,20 @@
-project(PackageTest C)
-cmake_minimum_required(VERSION 3.0)
+# Test for OpenSSL Conan package
+# Dmitriy Vetutnev, ODANT, 2018-2019
+
+
+project(PackageTest C CXX)
+cmake_minimum_required(VERSION 3.5)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
+
+if(UNIX)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+endif()
 
 enable_testing()
 
@@ -50,4 +62,16 @@ add_test(
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
     COMMAND test_crypto
 )
+
+# Test application
+
+add_test(
+    NAME "\"Application OpenSSL\""
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    COMMAND ${CMAKE_BINARY_DIR}/bin/openssl version
+)
+
+# Tests engine
+
+#add_subdirectory(engine)
 
