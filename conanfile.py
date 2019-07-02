@@ -1,3 +1,7 @@
+# OpenSSL Conan package
+# Dmitriy Vetutnev, ODANT, 2018-2019
+
+
 from conans import ConanFile, tools
 from conans.errors import ConanException
 import os, glob
@@ -23,12 +27,16 @@ class OpensslConan(ConanFile):
         "build_type": ["Debug", "Release"],
         "arch": ["x86_64", "x86", "mips"]
     }
-    options = {"shared": [False, True], "dll_sign": [False, True]}
-    default_options = "shared=True", "dll_sign=True"
-    exports_sources = "src/*", "FindOpenSSL.cmake"
+    options = {
+        "shared": [False, True],
+        "dll_sign": [False, True],
+        "with_unit_tests": [False, True],
+    }
+    default_options = "shared=True", "dll_sign=True", "with_unit_tests=False"
+    exports_sources = "src/*", "FindOpenSSL.cmake", "build.patch"
     no_copy_source = True
     build_policy = "missing"
-        
+
     def configure(self):
         # DLL sign
         if self.settings.os != "Windows" or not self.options.shared:
@@ -40,70 +48,75 @@ class OpensslConan(ConanFile):
         if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             self.build_requires("nasm/2.13.01@conan/stable")
-            toolset = str(self.settings.compiler.get_safe("toolset"))
-            if toolset.endswith("_xp"):
-                self.build_requires("find_sdk_winxp/[~=1.0]@%s/stable" % self.user)
         if get_safe(self.options, "dll_sign"):
             self.build_requires("windows_signtool/[~=1.0]@%s/stable" % self.user)
-            
+
+    def source(self):
+        tools.patch(patch_file="build.patch")
+
     def build(self):
         build_options = []
         build_options.append("threads")
-        build_options.append("no-comp")
-        build_options.append("no-unit-test")
-        build_options.append("no-hw")
-        build_options.append("no-dso")
-        build_options.append("no-dynamic-engine")
-        if self.settings.build_type == "Debug":
-            build_options.append("no-asm")
+        build_options.append("no-comp") # Disable ZLIB (possible CRIME attack)
+        build_options.append("enable-engine")
+        build_options.append("no-dynamic-engine") # Insert standard engines (from OpenSSL sources) into crypto library
+        #build_options.append("no-autoload-config")
+        #
         if not self.options.shared:
             build_options.append("no-shared")
-        build_options.append("--%s" % str(self.settings.build_type).lower())
+        #
+        if self.options.with_unit_tests:
+            build_options.append("enable-unit-test")
+        else:
+            build_options.append("no-tests")
+        #
+        if self.settings.build_type == "Debug":
+            build_options.append("no-asm")
+            build_options.append("--debug")
+        else:
+            build_options.append("--release")
+        #
         self.output.info("--------------Start build--------------")
         if self.settings.os == "Linux":
             self.unix_build(build_options)
         elif self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
             self.msvc_build(build_options)
         self.output.info("--------------Build done---------------")
-        
+
     def unix_build(self, build_options):
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
+        if self.options.shared:
+            build_options.append("-Wl,-rpath,'\\$$ORIGIN:\\$$ORIGIN/../lib'")
         target = {
             "x86": "linux-x86",
             "x86_64": "linux-x86_64",
             "mips": "linux-mips32"
         }.get(str(self.settings.arch))
         self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
-        self.run("make build_libs -j %s" % tools.cpu_count())
-        
+        self.run("make -j %s" % tools.cpu_count())
+        if self.options.with_unit_tests:
+            self.run("make test")
+
     def msvc_build(self, build_options):
-        toolset = str(self.settings.compiler.get_safe("toolset"))
-        if not toolset.endswith("_xp"):
-            build_options.append("-D_WIN32_WINNT=0x0601") # Windows 7 and Windows Server 2008 R2 minimal target
-        #
-        target = "VC-WIN"
-        if self.settings.arch == "x86_64":
-            target += "64A"
-        else:
-            target += "32"
-        #
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
+        build_options.append("-D_WIN32_WINNT=0x0601") # Windows 7 and Windows Server 2008 R2 minimal target
+        target = {
+            "x86": "VC-WIN32",
+            "x86_64": "VC-WIN64A"
+        }.get(str(self.settings.arch))
         env = tools.vcvars_dict(self.settings, filter_known_paths=False)
-        if toolset.endswith("_xp"):
-            import find_sdk_winxp
-            env = find_sdk_winxp.dict_append(self.settings.arch, env=env)
-        else:
-            env["LINK"] = "/subsystem:console,6.01"
+        env["LINK"] = "/subsystem:console,6.01" # Windows 7 and Windows Server 2008 R2 minimal target
         # Run build
         with tools.environment_append(env):
-            self.run("set")
             self.run("perl --version")
             self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
-            self.run("nmake build_libs") # Windows 7 and Windows Server 2008 R2 minimal target
-        
+            self.run("nmake")
+            if self.options.with_unit_tests:
+                self.run("nmake test")
+
     def package(self):
         self.copy("FindOpenSSL.cmake", src=".", dst=".")
-        self.copy("*.h", src="src/include/openssl", dst="include/openssl", keep_path=False)
+        self.copy("*.h", src="src/include/openssl", dst="include/openssl", keep_path=False, excludes="__DECC_INCLUDE_*")
         self.copy("*.h", src="include/openssl", dst="include/openssl", keep_path=False)
         if self.options.shared:
             self.copy("*.so*", dst="lib", keep_path=False, symlinks=True)
@@ -117,17 +130,24 @@ class OpensslConan(ConanFile):
             self.copy("libssl-*.dll", src=self.build_folder, dst="bin", keep_path=False)
             self.copy("libcrypto-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
             self.copy("libssl-*.pdb", src=self.build_folder, dst="bin", keep_path=False)
+        # Pack application
+        self.copy("openssl", dst="bin", src="apps", keep_path=False)
+        self.copy("openssl.exe", dst="bin", src="apps", keep_path=False)
         # Sign DLL
         if get_safe(self.options, "dll_sign"):
             import windows_signtool
-            pattern = os.path.join(self.package_folder, "bin", "*.dll")
-            for fpath in glob.glob(pattern):
+            patternDLL = os.path.join(self.package_folder, "bin", "*.dll")
+            patternEXE = os.path.join(self.package_folder, "bin", "*.exe")
+            for fpath in (glob.glob(patternDLL) + glob.glob(patternEXE)):
                 fpath = fpath.replace("\\", "/")
                 for alg in ["sha1", "sha256"]:
                     is_timestamp = True if self.settings.build_type == "Release" else False
                     cmd = windows_signtool.get_sign_command(fpath, digest_algorithm=alg, timestamp=is_timestamp)
                     self.output.info("Sign %s" % fpath)
                     self.run(cmd)
+
+    def package_id(self):
+        self.info.options.with_unit_tests = "any"
 
     def package_info(self):
         if self.settings.os == "Linux":

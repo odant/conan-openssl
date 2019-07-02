@@ -1,0 +1,23 @@
+diff --git a/src/Configurations/10-main.conf b/src/Configurations/10-main.conf
+index b49f04b5..641698ab 100644
+--- a/src/Configurations/10-main.conf
++++ b/src/Configurations/10-main.conf
+@@ -1363,7 +1363,8 @@ sub vms_info {
+         bn_asm_src       => sub { return undef unless @_;
+                                   my $r=join(" ",@_); $r=~s|asm/x86_64-gcc|bn_asm|; $r; },
+         perlasm_scheme   => "auto",
+-        multilib         => "-x64",
++        multilib         => picker(release => "-x64",
++                                   debug => "-x64d"),
+     },
+     "VC-WIN32" => {
+         # x86 Win32 target defaults to ANSI API, if you want UNICODE,
+@@ -1385,6 +1386,8 @@ sub vms_info {
+         bn_ops           => "BN_LLONG EXPORT_VAR_AS_FN",
+         perlasm_scheme   => sub { vc_win32_info()->{perlasm_scheme} },
+         build_scheme     => add("VC-W32", { separator => undef }),
++        multilib         => picker(release => "",
++                                   debug => "d"),
+     },
+     "VC-CE" => {
+         inherit_from     => [ "VC-common" ],

@@ -1,3 +1,7 @@
+# OpenSSL Conan package
+# Dmitriy Vetutnev, ODANT, 2018-2019
+
+
 set(OPENSSL_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_OPENSSL})
 
 function(from_hex HEX DEC)
@@ -94,7 +98,7 @@ if(OPENSSL_FOUND)
 
     include(CMakeFindDependencyMacro)
     find_dependency(Threads)
-  
+
     if(NOT TARGET OpenSSL::Crypto)
         add_library(OpenSSL::Crypto UNKNOWN IMPORTED)
         set_target_properties(OpenSSL::Crypto PROPERTIES
@@ -105,14 +109,20 @@ if(OPENSSL_FOUND)
             INTERFACE_LINK_LIBRARIES Threads::Threads
         )
     endif()
-    
+
+    if(UNIX)
+        set_property(TARGET OpenSSL::Crypto
+            APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${CMAKE_DL_LIBS}
+        )
+    endif()
+
     if(WIN32)
         set_property(TARGET OpenSSL::Crypto
             APPEND PROPERTY INTERFACE_LINK_LIBRARIES "crypt32" "ws2_32"
         )
     endif()
 
-    
+
     if(NOT TARGET OpenSSL::SSL)
         add_library(OpenSSL::SSL UNKNOWN IMPORTED)
         set_target_properties(OpenSSL::SSL PROPERTIES
@@ -123,11 +133,11 @@ if(OPENSSL_FOUND)
         )
     endif()
 
-    set(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})    
-    set(OPENSSL_LIBRARIES ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})    
+    set(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
+    set(OPENSSL_LIBRARIES ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
     set(OPENSSL_DEFINITIONS ${CONAN_COMPILE_DEFINITIONS_OPENSSL})
 
     mark_as_advanced(OPENSSL_INCLUDE_DIR OPENSSL_LIBRARIES)
-    
+
 endif()
 
