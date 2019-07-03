@@ -51,3 +51,4 @@ build: false
 
 test_script:
   - python build.py
+

@@ -48,8 +48,8 @@ matrix:
        CONAN_GCC_VERSIONS: 7
        CONAN_DOCKER_IMAGE: conanio/gcc7
        CONAN_ARCHS: x86
-    - <<: *linux_build
 
+    - <<: *linux_build
       env:
        CONAN_GCC_VERSIONS: 8
        CONAN_DOCKER_IMAGE: conanio/gcc8
