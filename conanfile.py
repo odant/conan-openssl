@@ -25,7 +25,7 @@ class OpensslConan(ConanFile):
         "os": ["Windows", "Linux"],
         "compiler": ["Visual Studio", "gcc"],
         "build_type": ["Debug", "Release"],
-        "arch": ["x86_64", "x86", "mips"]
+        "arch": ["x86_64", "x86", "mips", "armv7"]
     }
     options = {
         "shared": [False, True],
@@ -90,7 +90,8 @@ class OpensslConan(ConanFile):
         target = {
             "x86": "linux-x86",
             "x86_64": "linux-x86_64",
-            "mips": "linux-mips32"
+            "mips": "linux-mips32",
+            "armv7": "linux-armv4"
         }.get(str(self.settings.arch))
         self.run("%s %s %s" % (configure_cmd, " ".join(build_options), target))
         self.run("make -j %s" % tools.cpu_count())
