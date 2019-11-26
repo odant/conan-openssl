@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2018 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 1999-2019 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the OpenSSL license (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -39,11 +39,11 @@ extern "C" {
  * (Prior to 0.9.5a beta1, a different scheme was used: MMNNFFRBB for
  *  major minor fix final patch/beta)
  */
-# define OPENSSL_VERSION_NUMBER  0x101000bfL
+# define OPENSSL_VERSION_NUMBER  0x101000cfL
 # ifdef OPENSSL_FIPS
-#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.1.0k-fips  28 May 2019"
+#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.1.0l-fips  10 Sep 2019"
 # else
-#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.1.0k  28 May 2019"
+#  define OPENSSL_VERSION_TEXT    "OpenSSL 1.1.0l  10 Sep 2019"
 # endif
 
 /*-
