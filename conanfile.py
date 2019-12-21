@@ -16,7 +16,7 @@ def get_safe(options, name):
 
 class OpensslConan(ConanFile):
     name = "openssl"
-    version = "1.1.0l+1"
+    version = "1.1.0l+2"
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
                   "toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
