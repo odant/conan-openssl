@@ -5,8 +5,8 @@
                                    my $r=join(" ",@_); $r=~s|asm/x86_64-gcc|bn_asm|; $r; },
          perlasm_scheme   => "auto",
 -        multilib         => "-x64",
-+        multilib         => picker(release => "-x64",
-+                                   debug => "-x64d"),
++        multilib         => picker(release => "",
++                                   debug => "d"),
      },
      "VC-WIN32" => {
          # x86 Win32 target defaults to ANSI API, if you want UNICODE,
