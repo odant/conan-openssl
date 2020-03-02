@@ -45,7 +45,7 @@ class OpensslConan(ConanFile):
         del self.settings.compiler.libcxx
 
     def build_requirements(self):
-        if self.settings.os == "Windows" and self.settings.compiler == "Visual Studio":
+        if tools.os_info.is_windows:
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             self.build_requires("nasm/2.13.01@conan/stable")
         if get_safe(self.options, "dll_sign"):
