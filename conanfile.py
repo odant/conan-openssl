@@ -66,6 +66,7 @@ class OpensslConan(ConanFile):
         #
         if self.options.with_unit_tests:
             build_options.append("enable-unit-test")
+            build_options.append("enable-buildtest-c++")
         else:
             build_options.append("no-tests")
         #
