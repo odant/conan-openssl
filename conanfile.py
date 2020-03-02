@@ -16,7 +16,7 @@ def get_safe(options, name):
 
 class OpensslConan(ConanFile):
     name = "openssl"
-    version = "1.1.1b"
+    version = "1.1.1d"
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
                   "toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
@@ -56,7 +56,6 @@ class OpensslConan(ConanFile):
 
     def build(self):
         build_options = []
-        build_options.append("threads")
         build_options.append("no-comp") # Disable ZLIB (possible CRIME attack)
         build_options.append("enable-engine")
         build_options.append("no-dynamic-engine") # Insert standard engines (from OpenSSL sources) into crypto library
