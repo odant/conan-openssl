@@ -1,5 +1,5 @@
 diff --git a/src/Configurations/10-main.conf b/src/Configurations/10-main.conf
-index 930f2d3c92..176207ae0c 100644
+index df1cc00529..57674105e7 100644
 --- a/src/Configurations/10-main.conf
 +++ b/src/Configurations/10-main.conf
 @@ -1308,7 +1308,8 @@ my %targets = (
@@ -12,7 +12,7 @@ index 930f2d3c92..176207ae0c 100644
      },
      "VC-WIN32" => {
          inherit_from     => [ "VC-noCE-common", asm("x86_asm"),
-@@ -1324,6 +1325,8 @@ my %targets = (
+@@ -1323,6 +1324,8 @@ my %targets = (
          # "WOW" stands for "Windows on Windows", and "VC-WOW" engages
          # some installation path heuristics in windows-makefile.tmpl...
          build_scheme     => add("VC-WOW", { separator => undef }),
