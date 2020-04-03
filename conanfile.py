@@ -1,17 +1,9 @@
 # OpenSSL Conan package
-# Dmitriy Vetutnev, ODANT, 2018-2019
+# Dmitriy Vetutnev, ODANT, 2018-2020
 
 
 from conans import ConanFile, tools
-from conans.errors import ConanException
 import os, glob
-
-
-def get_safe(options, name):
-    try:
-        return getattr(options, name, None)
-    except ConanException:
-        return None
 
 
 class OpensslConan(ConanFile):
@@ -48,7 +40,7 @@ class OpensslConan(ConanFile):
         if tools.os_info.is_windows:
             self.build_requires("strawberryperl/5.30.0.1")
             self.build_requires("nasm/2.14")
-        if get_safe(self.options, "dll_sign"):
+        if self.options.get_safe("dll_sign"):
             self.build_requires("windows_signtool/[~=1.1]@%s/stable" % self.user)
 
     def source(self):
@@ -134,7 +126,7 @@ class OpensslConan(ConanFile):
         self.copy("openssl", dst="bin", src="apps", keep_path=False)
         self.copy("openssl.exe", dst="bin", src="apps", keep_path=False)
         # Sign DLL
-        if get_safe(self.options, "dll_sign"):
+        if self.options.get_safe("dll_sign"):
             import windows_signtool
             patternDLL = os.path.join(self.package_folder, "bin", "*.dll")
             patternEXE = os.path.join(self.package_folder, "bin", "*.exe")
