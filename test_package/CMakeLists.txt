@@ -1,9 +1,11 @@
 # Test for OpenSSL Conan package
-# Dmitriy Vetutnev, ODANT, 2018-2019
+# Dmitriy Vetutnev, ODANT, 2018-2020
 
 
 project(PackageTest C CXX)
 cmake_minimum_required(VERSION 3.5)
+
+option(DISABLE_TEST_ENGINE "Disable test dymanic load engine" OFF)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
@@ -72,6 +74,7 @@ add_test(
 )
 
 # Tests engine
-
-add_subdirectory(engine)
+if (NOT DISABLE_TEST_ENGINE)
+    add_subdirectory(engine)
+endif()
 

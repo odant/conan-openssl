@@ -20,6 +20,8 @@ class PackageTestConan(ConanFile):
 
     def build(self):
         cmake = CMake(self, generator="Ninja", msbuild_verbosity='normal')
+        if not self.options["openssl"].shared:
+            cmake.definitions["DISABLE_TEST_ENGINE"] = "ON"
         cmake.verbose = True
         cmake.configure()
         cmake.build()

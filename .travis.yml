@@ -14,7 +14,6 @@ env:
     CONAN_LOGIN_USERNAME: travis
     CONAN_STABLE_BRANCH_PATTERN: release/*
 
-    CONAN_OPTIONS: openssl:with_unit_tests=True
     CONAN_SHARED_OPTION_NAME: False
     CONAN_PURE_C: True
 
@@ -34,6 +33,7 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc6
        CONAN_BUILD_TYPES: Release
        CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
 
     - <<: *linux_build
       env:
@@ -41,6 +41,23 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc6
        CONAN_BUILD_TYPES: Debug
        CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 6
+       CONAN_DOCKER_IMAGE: conanio/gcc6
+       CONAN_BUILD_TYPES: Release
+       CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 6
+       CONAN_DOCKER_IMAGE: conanio/gcc6
+       CONAN_BUILD_TYPES: Debug
+       CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
 
     - <<: *linux_build
       env:
@@ -48,6 +65,7 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc6
        CONAN_BUILD_TYPES: Release
        CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
 
     - <<: *linux_build
       env:
@@ -55,6 +73,23 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc6
        CONAN_BUILD_TYPES: Debug
        CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 6
+       CONAN_DOCKER_IMAGE: conanio/gcc6
+       CONAN_BUILD_TYPES: Release
+       CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 6
+       CONAN_DOCKER_IMAGE: conanio/gcc6
+       CONAN_BUILD_TYPES: Debug
+       CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
 
     - <<: *linux_build
       env:
@@ -62,6 +97,7 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc7
        CONAN_BUILD_TYPES: Release
        CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
 
     - <<: *linux_build
       env:
@@ -69,6 +105,23 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc7
        CONAN_BUILD_TYPES: Debug
        CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 7
+       CONAN_DOCKER_IMAGE: conanio/gcc7
+       CONAN_BUILD_TYPES: Release
+       CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 7
+       CONAN_DOCKER_IMAGE: conanio/gcc7
+       CONAN_BUILD_TYPES: Debug
+       CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
 
     - <<: *linux_build
       env:
@@ -76,6 +129,7 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc7
        CONAN_BUILD_TYPES: Release
        CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
 
     - <<: *linux_build
       env:
@@ -83,6 +137,23 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc7
        CONAN_BUILD_TYPES: Debug
        CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 7
+       CONAN_DOCKER_IMAGE: conanio/gcc7
+       CONAN_BUILD_TYPES: Release
+       CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 7
+       CONAN_DOCKER_IMAGE: conanio/gcc7
+       CONAN_BUILD_TYPES: Debug
+       CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
 
     - <<: *linux_build
       env:
@@ -90,6 +161,7 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc8
        CONAN_BUILD_TYPES: Release
        CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
 
     - <<: *linux_build
       env:
@@ -97,6 +169,23 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc8
        CONAN_BUILD_TYPES: Debug
        CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 8
+       CONAN_DOCKER_IMAGE: conanio/gcc8
+       CONAN_BUILD_TYPES: Release
+       CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 8
+       CONAN_DOCKER_IMAGE: conanio/gcc8
+       CONAN_BUILD_TYPES: Debug
+       CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
 
     - <<: *linux_build
       env:
@@ -104,6 +193,7 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc8
        CONAN_BUILD_TYPES: Release
        CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
 
     - <<: *linux_build
       env:
@@ -111,6 +201,23 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc8
        CONAN_BUILD_TYPES: Debug
        CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 8
+       CONAN_DOCKER_IMAGE: conanio/gcc8
+       CONAN_BUILD_TYPES: Release
+       CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 8
+       CONAN_DOCKER_IMAGE: conanio/gcc8
+       CONAN_BUILD_TYPES: Debug
+       CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
 
     - <<: *linux_build
       env:
@@ -118,6 +225,7 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc9
        CONAN_BUILD_TYPES: Release
        CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
 
     - <<: *linux_build
       env:
@@ -125,6 +233,23 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc9
        CONAN_BUILD_TYPES: Debug
        CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 9
+       CONAN_DOCKER_IMAGE: conanio/gcc9
+       CONAN_BUILD_TYPES: Release
+       CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 9
+       CONAN_DOCKER_IMAGE: conanio/gcc9
+       CONAN_BUILD_TYPES: Debug
+       CONAN_ARCHS: x86_64
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
 
     - <<: *linux_build
       env:
@@ -132,6 +257,7 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc9
        CONAN_BUILD_TYPES: Release
        CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
 
     - <<: *linux_build
       env:
@@ -139,6 +265,23 @@ matrix:
        CONAN_DOCKER_IMAGE: conanio/gcc9
        CONAN_BUILD_TYPES: Debug
        CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=True
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 9
+       CONAN_DOCKER_IMAGE: conanio/gcc9
+       CONAN_BUILD_TYPES: Release
+       CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
+
+    - <<: *linux_build
+      env:
+       CONAN_GCC_VERSIONS: 9
+       CONAN_DOCKER_IMAGE: conanio/gcc9
+       CONAN_BUILD_TYPES: Debug
+       CONAN_ARCHS: x86
+       CONAN_OPTIONS: openssl:with_unit_tests=True,openssl:shared=False
 
 install:
   - pip install conan
