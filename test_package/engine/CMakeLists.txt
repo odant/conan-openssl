@@ -10,6 +10,9 @@ cmake_minimum_required(VERSION 3.5)
 
 add_library(dummy_engine SHARED dummy.c)
 target_link_libraries(dummy_engine OpenSSL::Crypto)
+if(MSVC AND CMAKE_GENERATOR STREQUAL "Ninja")
+    target_compile_definitions(dummy_engine PRIVATE _WINDLL)
+endif()
 
 add_test(
     NAME "\"Command-line load external dummy engine\""
@@ -21,6 +24,9 @@ add_test(
 
 add_library(fakerand_engine SHARED fakerand.c)
 target_link_libraries(fakerand_engine OpenSSL::Crypto)
+if(MSVC AND CMAKE_GENERATOR STREQUAL "Ninja")
+    target_compile_definitions(fakerand_engine PRIVATE _WINDLL)
+endif()
 
 add_test(
     NAME "\"Command-line load external fake random engine\""
