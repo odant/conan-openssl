@@ -6,8 +6,6 @@ environment:
   CONAN_PRINT_RUN_COMMANDS: 1
   CONAN_LOG_RUN_TO_OUTPUT: 1
 
-  CONAN_DISABLE_DLL_SIGN: 1
-
   CONAN_REFERENCE: openssl/1.1.1f+0
   CONAN_USERNAME: odant
   CONAN_CHANNEL: testing
@@ -17,11 +15,14 @@ environment:
   CONAN_LOGIN_USERNAME: appveyor
   CONAN_STABLE_BRANCH_PATTERN: release/*
 
-  WITH_UNIT_TESTS: 1
+  CONAN_OPTIONS: openssl:with_unit_tests=True
+  CONAN_SHARED_OPTION_NAME: False
+  CONAN_PURE_C: True
 
   matrix:
 
 # Visual Studio 2017
+
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       CONAN_VISUAL_VERSIONS: 15
       CONAN_VISUAL_RUNTIMES: MD
@@ -47,6 +48,7 @@ environment:
       CONAN_ARCHS: x86
 
 # Visual Studio 2019
+
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       CONAN_VISUAL_VERSIONS: 16
       CONAN_VISUAL_RUNTIMES: MD
