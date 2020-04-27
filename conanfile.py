@@ -8,7 +8,7 @@ import os, glob
 
 class OpensslConan(ConanFile):
     name = "openssl"
-    version = "1.1.1g+0"
+    version = "1.1.1g+1"
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
                   "toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
@@ -111,7 +111,8 @@ class OpensslConan(ConanFile):
         self.copy("*.h", src="src/include/openssl", dst="include/openssl", keep_path=False, excludes="__DECC_INCLUDE_*")
         self.copy("*.h", src="include/openssl", dst="include/openssl", keep_path=False)
         if self.options.shared:
-            self.copy("*.so*", dst="lib", keep_path=False, symlinks=True)
+            self.copy("libcrypto.so*", dst="lib", keep_path=False, symlinks=True)
+            self.copy("libssl.so*", dst="lib", keep_path=False, symlinks=True)
         else:
             self.copy("*.a", dst="lib", keep_path=False)
         if self.settings.os == "Windows":
