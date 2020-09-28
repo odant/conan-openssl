@@ -7,8 +7,8 @@ index df1cc00529..57674105e7 100644
                                    my $r=join(" ",@_); $r=~s|asm/x86_64-gcc|bn_asm|; $r; },
          perlasm_scheme   => "auto",
 -        multilib         => "-x64",
-+        multilib         => picker(release => "-x64",
-+                                   debug => "-x64d"),
++        multilib         => picker(release => "",
++                                   debug => "d"),
      },
      "VC-WIN32" => {
          inherit_from     => [ "VC-noCE-common", asm("x86_asm"),
