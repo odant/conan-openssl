@@ -8,14 +8,14 @@ import os, glob
 
 class OpensslConan(ConanFile):
     name = "openssl"
-    version = "1.1.1h+0"
+    version = "1.1.1h+1"
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
                   "toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
     url = "https://github.com/odant/conan-openssl"
     settings = {
         "os": ["Windows", "Linux"],
-        "compiler": ["Visual Studio", "gcc"],
+        "compiler": ["Visual Studio", "gcc", "clang"],
         "build_type": ["Debug", "Release"],
         "arch": ["x86_64", "x86", "mips", "armv7"]
     }
