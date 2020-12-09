@@ -2,7 +2,7 @@
 # Dmitriy Vetutnev, ODANT, 2020
 
 
-from cpt import ConanMultiPackager
+from cpt.packager import ConanMultiPackager
 
 
 if __name__ == "__main__":
