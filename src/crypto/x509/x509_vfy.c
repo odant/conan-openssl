@@ -312,8 +312,20 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
     return ret;
 }
 
+static int sk_X509_contains(STACK_OF(X509) *sk, X509 *cert)
+{
+    int i, n = sk_X509_num(sk);
+
+    for (i = 0; i < n; i++)
+        if (X509_cmp(sk_X509_value(sk, i), cert) == 0)
+            return 1;
+    return 0;
+}
+
 /*
- * Given a STACK_OF(X509) find the issuer of cert (if any)
+ * Find in given STACK_OF(X509) sk a non-expired issuer cert (if any) of given cert x.
+ * The issuer must not be the same as x and must not yet be in ctx->chain, where the
+ * exceptional case x is self-issued and ctx->chain has just one element is allowed.
  */
 static X509 *find_issuer(X509_STORE_CTX *ctx, STACK_OF(X509) *sk, X509 *x)
 {
@@ -322,7 +334,13 @@ static X509 *find_issuer(X509_STORE_CTX *ctx, STACK_OF(X509) *sk, X509 *x)
 
     for (i = 0; i < sk_X509_num(sk); i++) {
         issuer = sk_X509_value(sk, i);
-        if (ctx->check_issued(ctx, x, issuer)) {
+        /*
+         * Below check 'issuer != x' is an optimization and safety precaution:
+         * Candidate issuer cert cannot be the same as the subject cert 'x'.
+         */
+        if (issuer != x && ctx->check_issued(ctx, x, issuer)
+            && (((x->ex_flags & EXFLAG_SI) != 0 && sk_X509_num(ctx->chain) == 1)
+                || !sk_X509_contains(ctx->chain, issuer))) {
             rv = issuer;
             if (x509_check_cert_time(ctx, rv, -1))
                 break;
@@ -354,7 +372,6 @@ static int check_issued(X509_STORE_CTX *ctx, X509 *x, X509 *issuer)
 }
 
 /* Alternative lookup method: look from a STACK stored in other_ctx */
-
 static int get_issuer_sk(X509 **issuer, X509_STORE_CTX *ctx, X509 *x)
 {
     *issuer = find_issuer(ctx, ctx->other_ctx, x);
@@ -1740,7 +1757,7 @@ static int internal_verify(X509_STORE_CTX *ctx)
     if (ctx->bare_ta_signed) {
         xs = xi;
         xi = NULL;
-        goto check_cert;
+        goto check_cert_time;
     }
 
     if (ctx->check_issued(ctx, xi, xi))
@@ -1748,11 +1765,17 @@ static int internal_verify(X509_STORE_CTX *ctx)
     else {
         if (ctx->param->flags & X509_V_FLAG_PARTIAL_CHAIN) {
             xs = xi;
-            goto check_cert;
+            goto check_cert_time;
         }
-        if (n <= 0)
-            return verify_cb_cert(ctx, xi, 0,
-                                  X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE);
+        if (n <= 0) {
+            if (!verify_cb_cert(ctx, xi, 0,
+                                X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE))
+                return 0;
+
+            xs = xi;
+            goto check_cert_time;
+        }
+
         n--;
         ctx->error_depth = n;
         xs = sk_X509_value(ctx->chain, n);
@@ -1811,7 +1834,7 @@ static int internal_verify(X509_STORE_CTX *ctx)
             }
         }
 
- check_cert:
+    check_cert_time: /* in addition to RFC 5280, do also for trusted (root) cert */
         /* Calls verify callback as needed */
         if (!x509_check_cert_time(ctx, xs, n))
             return 0;
