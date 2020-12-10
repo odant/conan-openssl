@@ -27,7 +27,7 @@ sub verify {
     run(app([@args]));
 }
 
-plan tests => 143;
+plan tests => 145;
 
 # Canonical success
 ok(verify("ee-cert", "sslserver", ["root-cert"], ["ca-cert"]),
