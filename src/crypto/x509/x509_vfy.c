@@ -349,26 +349,10 @@ static X509 *find_issuer(X509_STORE_CTX *ctx, STACK_OF(X509) *sk, X509 *x)
     return rv;
 }
 
-/*
- * Check that the given certificate 'x' is issued by the certificate 'issuer'
- * and the issuer is not yet in ctx->chain, where the exceptional case
- * that 'x' is self-issued and ctx->chain has just one element is allowed.
- */
+/* Check that the given certificate 'x' is issued by the certificate 'issuer' */
 static int check_issued(X509_STORE_CTX *ctx, X509 *x, X509 *issuer)
 {
-    if (x509_likely_issued(issuer, x) != X509_V_OK)
-        return 0;
-    if ((x->ex_flags & EXFLAG_SI) == 0 || sk_X509_num(ctx->chain) != 1) {
-        int i;
-        X509 *ch;
-
-        for (i = 0; i < sk_X509_num(ctx->chain); i++) {
-            ch = sk_X509_value(ctx->chain, i);
-            if (ch == issuer || X509_cmp(ch, issuer) == 0)
-                return 0;
-        }
-    }
-    return 1;
+    return x509_likely_issued(issuer, x) == X509_V_OK;
 }
 
 /* Alternative lookup method: look from a STACK stored in other_ctx */
