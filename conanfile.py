@@ -96,7 +96,7 @@ class OpensslConan(ConanFile):
             "x86": "VC-WIN32",
             "x86_64": "VC-WIN64A"
         }.get(str(self.settings.arch))
-        env = tools.vcvars_dict(self.settings, filter_known_paths=False)
+        env = tools.vcvars_dict(self.settings)
         env["LINK"] = "/subsystem:console,6.01" # Windows 7 and Windows Server 2008 R2 minimal target
         # Run build
         with tools.environment_append(env):
