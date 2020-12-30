@@ -8,7 +8,7 @@ import os, glob
 
 class OpensslConan(ConanFile):
     name = "openssl"
-    version = "1.1.1i+0"
+    version = "1.1.1i+1"
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
                   "toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
@@ -39,7 +39,7 @@ class OpensslConan(ConanFile):
     def build_requirements(self):
         if tools.os_info.is_windows:
             self.build_requires("strawberryperl/5.30.0.1")
-            self.build_requires("nasm/2.14")
+            self.build_requires("nasm/2.15.05")
         if self.options.get_safe("dll_sign"):
             self.build_requires("windows_signtool/[~=1.1]@%s/stable" % self.user)
 
@@ -96,7 +96,7 @@ class OpensslConan(ConanFile):
             "x86": "VC-WIN32",
             "x86_64": "VC-WIN64A"
         }.get(str(self.settings.arch))
-        env = tools.vcvars_dict(self.settings, filter_known_paths=False)
+        env = tools.vcvars_dict(self.settings)
         env["LINK"] = "/subsystem:console,6.01" # Windows 7 and Windows Server 2008 R2 minimal target
         # Run build
         with tools.environment_append(env):
