@@ -39,7 +39,7 @@ class OpensslConan(ConanFile):
     def build_requirements(self):
         if tools.os_info.is_windows:
             self.build_requires("strawberryperl/5.30.0.1")
-            self.build_requires("nasm/2.14")
+            self.build_requires("nasm/2.15.05")
         if self.options.get_safe("dll_sign"):
             self.build_requires("windows_signtool/[~=1.1]@%s/stable" % self.user)
 
