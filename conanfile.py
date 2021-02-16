@@ -1,5 +1,5 @@
 # OpenSSL Conan package
-# Dmitriy Vetutnev, ODANT, 2018-2020
+# Dmitriy Vetutnev, ODANT, 2018-2021
 
 
 from conans import ConanFile, tools
@@ -8,7 +8,7 @@ import os, glob
 
 class OpensslConan(ConanFile):
     name = "openssl"
-    version = "1.1.1i+1"
+    version = "1.1.1j+0"
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
                   "toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
