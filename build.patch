@@ -1,18 +1,18 @@
 diff --git a/src/Configurations/10-main.conf b/src/Configurations/10-main.conf
-index df1cc00529..57674105e7 100644
+index 468698a3..c5fc9cff 100644
 --- a/src/Configurations/10-main.conf
 +++ b/src/Configurations/10-main.conf
-@@ -1316,7 +1316,8 @@ my %targets = (
-         bn_asm_src       => sub { return undef unless @_;
-                                   my $r=join(" ",@_); $r=~s|asm/x86_64-gcc|bn_asm|; $r; },
+@@ -1394,7 +1394,8 @@ my %targets = (
+         uplink_arch      => 'x86_64',
+         asm_arch         => 'x86_64',
          perlasm_scheme   => "auto",
 -        multilib         => "-x64",
 +        multilib         => picker(release => "",
 +                                   debug => "d"),
      },
      "VC-WIN32" => {
-         inherit_from     => [ "VC-noCE-common", asm("x86_asm"),
-@@ -1331,6 +1332,8 @@ my %targets = (
+         inherit_from     => [ "VC-noCE-common" ],
+@@ -1410,6 +1411,8 @@ my %targets = (
          # "WOW" stands for "Windows on Windows", and "VC-WOW" engages
          # some installation path heuristics in windows-makefile.tmpl...
          build_scheme     => add("VC-WOW", { separator => undef }),
