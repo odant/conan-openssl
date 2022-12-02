@@ -36,39 +36,18 @@ function(from_hex HEX DEC)
 endfunction()
 
 if(OPENSSL_INCLUDE_DIR AND EXISTS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h")
-  file(STRINGS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h" openssl_version_str
-       REGEX "^#[\t ]*define[\t ]+OPENSSL_VERSION_NUMBER[\t ]+0x([0-9a-fA-F])+.*")
+    file(STRINGS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h" DEFINE_OPENSSL_MAJOR_VERSION REGEX "^[ \\t]*#[ \\t]*define[ \\t]+OPENSSL_VERSION_MAJOR[ \\t]+")
+    string(REGEX REPLACE "^[ \\t]*#[ \\t]*define[ \\t]+OPENSSL_VERSION_MAJOR[ \\t]+([0-9]+).*$" "\\1" OPENSSL_VERSION_MAJOR "${DEFINE_OPENSSL_MAJOR_VERSION}")
 
-  if(openssl_version_str)
-    # The version number is encoded as 0xMNNFFPPS: major minor fix patch status
-    # The status gives if this is a developer or prerelease and is ignored here.
-    # Major, minor, and fix directly translate into the version numbers shown in
-    # the string. The patch field translates to the single character suffix that
-    # indicates the bug fix state, which 00 -> nothing, 01 -> a, 02 -> b and so
-    # on.
+    file(STRINGS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h" DEFINE_OPENSSL_MINOR_VERSION REGEX "^[ \\t]*#[ \\t]*define[ \\t]+OPENSSL_VERSION_MINOR[ \\t]+")
+    string(REGEX REPLACE "^[ \\t]*#[ \\t]*define[ \\t]+OPENSSL_VERSION_MINOR[ \\t]+([0-9]+).*$" "\\1" OPENSSL_VERSION_MINOR "${DEFINE_OPENSSL_MINOR_VERSION}")
 
-    string(REGEX REPLACE "^.*OPENSSL_VERSION_NUMBER[\t ]+0x([0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F]).*$"
-           "\\1;\\2;\\3;\\4;\\5" OPENSSL_VERSION_LIST "${openssl_version_str}")
-    list(GET OPENSSL_VERSION_LIST 0 OPENSSL_VERSION_MAJOR)
-    list(GET OPENSSL_VERSION_LIST 1 OPENSSL_VERSION_MINOR)
-    from_hex("${OPENSSL_VERSION_MINOR}" OPENSSL_VERSION_MINOR)
-    list(GET OPENSSL_VERSION_LIST 2 OPENSSL_VERSION_FIX)
-    from_hex("${OPENSSL_VERSION_FIX}" OPENSSL_VERSION_FIX)
-    list(GET OPENSSL_VERSION_LIST 3 OPENSSL_VERSION_PATCH)
+    file(STRINGS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h" DEFINE_OPENSSL_PATCH_VERSION REGEX "^[ \\t]*#[ \\t]*define[ \\t]+OPENSSL_VERSION_PATCH[ \\t]+")
+    string(REGEX REPLACE "^[ \\t]*#[ \\t]*define[ \\t]+OPENSSL_VERSION_PATCH[ \\t]+([0-9]+).*$" "\\1" OPENSSL_VERSION_PATCH "${DEFINE_OPENSSL_PATCH_VERSION}")
 
-    if (NOT OPENSSL_VERSION_PATCH STREQUAL "00")
-      from_hex("${OPENSSL_VERSION_PATCH}" _tmp)
-      # 96 is the ASCII code of 'a' minus 1
-      math(EXPR OPENSSL_VERSION_PATCH_ASCII "${_tmp} + 96")
-      unset(_tmp)
-      # Once anyone knows how OpenSSL would call the patch versions beyond 'z'
-      # this should be updated to handle that, too. This has not happened yet
-      # so it is simply ignored here for now.
-      string(ASCII "${OPENSSL_VERSION_PATCH_ASCII}" OPENSSL_VERSION_PATCH_STRING)
-    endif ()
-
-    set(OPENSSL_VERSION "${OPENSSL_VERSION_MAJOR}.${OPENSSL_VERSION_MINOR}.${OPENSSL_VERSION_FIX}${OPENSSL_VERSION_PATCH_STRING}")
-  endif ()
+    set(OPENSSL_VERSION_STRING "${OPENSSL_VERSION_MAJOR}.${OPENSSL_VERSION_MINOR}.${OPENSSL_VERSION_PATCH}")
+    set(OPENSSL_VERSION ${OPENSSL_VERSION_STRING})
+    set(OPENSSL_VERSION_COUNT 3)
 endif ()
 
 find_library(OPENSSL_CRYPTO_LIBRARY
