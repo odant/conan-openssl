@@ -25,7 +25,7 @@ class OpensslConan(ConanFile):
         "with_unit_tests": [False, True],
     }
     default_options = "shared=True", "dll_sign=True", "with_unit_tests=False"
-    exports_sources = "src/*", "FindOpenSSL.cmake", "build.patch"
+    exports_sources = "src/*", "FindOpenSSL.cmake", "build.patch", "legacy_provider_static_linkage.patch"
     no_copy_source = True
     build_policy = "missing"
 
@@ -45,6 +45,7 @@ class OpensslConan(ConanFile):
 
     def source(self):
         tools.patch(patch_file="build.patch")
+        tools.patch(patch_file="legacy_provider_static_linkage.patch")
 
     def build(self):
         build_options = []

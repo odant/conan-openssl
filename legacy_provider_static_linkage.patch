@@ -1,0 +1,82 @@
+diff --git a/src/providers/build.info b/src/providers/build.info
+index 3b211bbb..bb2dc2bc 100644
+--- a/src/providers/build.info
++++ b/src/providers/build.info
+@@ -132,7 +132,6 @@ ENDIF
+ IF[{- !$disabled{legacy} -}]
+   LIBS{noinst}=$LIBLEGACY
+ 
+-  IF[{- $disabled{module} -}]
+     # Become built in
+     # In this case, we need to do the same thing a for the default provider,
+     # and make the liblegacy object files end up in libcrypto.  We could also
+@@ -142,25 +141,6 @@ IF[{- !$disabled{legacy} -}]
+     $LEGACYGOAL=../libcrypto
+     SOURCE[$LEGACYGOAL]=$LIBLEGACY
+     DEFINE[$LEGACYGOAL]=STATIC_LEGACY
+-  ELSE
+-    # Become a module
+-    # In this case, we can work with dependencies
+-    $LEGACYGOAL=legacy
+-    MODULES=$LEGACYGOAL
+-    DEPEND[$LEGACYGOAL]=$LIBLEGACY ../libcrypto
+-    IF[{- defined $target{shared_defflag} -}]
+-      SOURCE[legacy]=legacy.ld
+-      GENERATE[legacy.ld]=../util/providers.num
+-    ENDIF
+-
+-    # Add VERSIONINFO resource for windows
+-    IF[{- $config{target} =~ /^(?:Cygwin|mingw|VC-|BC-)/ -}]
+-      GENERATE[legacy.rc]=../util/mkrc.pl legacy
+-      SOURCE[$LEGACYGOAL]=legacy.rc
+-    ENDIF
+-
+-    SOURCE[$LIBLEGACY]=prov_running.c
+-  ENDIF
+ 
+   # Common things that are valid no matter what form the Legacy provider
+   # takes.
+diff --git a/src/providers/common/build.info b/src/providers/common/build.info
+index a14bf090..e23ff588 100644
+--- a/src/providers/common/build.info
++++ b/src/providers/common/build.info
+@@ -4,7 +4,4 @@ SOURCE[../libcommon.a]=provider_err.c provider_ctx.c
+ $FIPSCOMMON=provider_util.c capabilities.c bio_prov.c digest_to_nid.c\
+             securitycheck.c provider_seeding.c
+ SOURCE[../libdefault.a]=$FIPSCOMMON securitycheck_default.c
+-IF[{- !$disabled{module} && !$disabled{shared} -}]
+-  SOURCE[../liblegacy.a]=provider_util.c
+-ENDIF
+ SOURCE[../libfips.a]=$FIPSCOMMON securitycheck_fips.c
+diff --git a/src/providers/implementations/ciphers/build.info b/src/providers/implementations/ciphers/build.info
+index e4c5f4f0..9d9ece69 100644
+--- a/src/providers/implementations/ciphers/build.info
++++ b/src/providers/implementations/ciphers/build.info
+@@ -65,10 +65,6 @@ IF[{- !$disabled{des} -}]
+   SOURCE[$DES_GOAL]=\
+       cipher_desx.c cipher_desx_hw.c \
+       cipher_des.c cipher_des_hw.c
+- IF[{- !$disabled{module} -}]
+-   SOURCE[$DES_GOAL]=\
+-       cipher_tdes_common.c
+- ENDIF
+ ENDIF
+ 
+ IF[{- !$disabled{aria} -}]
+diff --git a/src/providers/implementations/digests/build.info b/src/providers/implementations/digests/build.info
+index d3097502..cb744d16 100644
+--- a/src/providers/implementations/digests/build.info
++++ b/src/providers/implementations/digests/build.info
+@@ -15,11 +15,7 @@ $MD2_GOAL=../../liblegacy.a
+ $MD4_GOAL=../../liblegacy.a
+ $MDC2_GOAL=../../liblegacy.a
+ $WHIRLPOOL_GOAL=../../liblegacy.a
+-IF[{- !$disabled{module} -}]
+-  $RIPEMD_GOAL=../../libdefault.a ../../liblegacy.a
+-ELSE
+-  $RIPEMD_GOAL=../../libdefault.a
+-ENDIF
++$RIPEMD_GOAL=../../libdefault.a
+ 
+ # This source is common for all digests in all our providers.
+ SOURCE[$COMMON_GOAL]=digestcommon.c
