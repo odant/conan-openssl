@@ -1,23 +1,37 @@
 diff --git a/src/Configurations/10-main.conf b/src/Configurations/10-main.conf
-index 468698a3..c5fc9cff 100644
+index e74adb50..19024062 100644
 --- a/src/Configurations/10-main.conf
 +++ b/src/Configurations/10-main.conf
-@@ -1463,7 +1463,8 @@ my %targets = (
+@@ -1463,7 +1463,15 @@ my %targets = (
          uplink_arch      => 'x86_64',
          asm_arch         => 'x86_64',
          perlasm_scheme   => sub { vc_win64a_info()->{perlasm_scheme} },
 -        multilib         => "-x64",
 +        multilib         => picker(release => "",
 +                                   debug => "d"),
++    },
++    "VC-WIN64A-CLANGCL" => {
++        CC               => "clang-cl",
++        LD               => "lld-link",
++        AR               => "llvm-lib",
++        inherit_from     => [ "VC-WIN64A" ],
++        sys_id           => "WIN64A-CLANGCL"
      },
      "VC-WIN32" => {
          inherit_from     => [ "VC-noCE-common" ],
-@@ -1479,6 +1480,8 @@ my %targets = (
+@@ -1479,6 +1487,15 @@ my %targets = (
          # "WOW" stands for "Windows on Windows", and "VC-WOW" engages
          # some installation path heuristics in windows-makefile.tmpl...
          build_scheme     => add("VC-WOW", { separator => undef }),
 +        multilib         => picker(release => "",
 +                                   debug => "d"),
++    },
++    "VC-WIN32-CLANGCL" => {
++        CC               => "clang-cl",
++        LD               => "lld-link",
++        AR               => "llvm-lib",
++        inherit_from     => [ "VC-WIN32" ],
++        sys_id           => "VC-WIN32-CLANGCL"
      },
      "VC-CE" => {
          inherit_from     => [ "VC-common" ],

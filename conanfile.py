@@ -80,7 +80,7 @@ class OpensslConan(ConanFile):
         self.output.info("--------------Start build--------------")
         if self.settings.os == "Linux":
             self.unix_build(build_options)
-        elif self.settings.os == "Windows" and self.settings.compiler == "msvc":
+        elif self.settings.os == "Windows" and (self.settings.compiler == "msvc" or (self.settings.compiler == "clang" and self.settings.compiler.runtime_version)):
             self.msvc_build(build_options)
         self.output.info("--------------Build done---------------")
 
@@ -102,10 +102,16 @@ class OpensslConan(ConanFile):
     def msvc_build(self, build_options):
         configure_cmd = "perl " + os.path.join(self.source_folder, "src", "Configure")
         build_options.append("-D_WIN32_WINNT=0x0601") # Windows 7 and Windows Server 2008 R2 minimal target
-        target = {
-            "x86": "VC-WIN32",
-            "x86_64": "VC-WIN64A"
-        }.get(str(self.settings.arch))
+        if self.settings.compiler == "msvc":
+            target = {
+                "x86": "VC-WIN32",
+                "x86_64": "VC-WIN64A"
+            }.get(str(self.settings.arch))
+        else:    
+            target = {
+                "x86": "VC-WIN32-CLANGCL",
+                "x86_64": "VC-WIN64A-CLANGCL"
+            }.get(str(self.settings.arch))
         env = tools.env.Environment()
         env.append("LINK", "/subsystem:console,6.01")
         # Run build
