@@ -2,7 +2,7 @@ diff --git a/src/Configurations/10-main.conf b/src/Configurations/10-main.conf
 index e74adb50..19024062 100644
 --- a/src/Configurations/10-main.conf
 +++ b/src/Configurations/10-main.conf
-@@ -1463,7 +1463,15 @@ my %targets = (
+@@ -1464,7 +1464,15 @@ my %targets = (
          uplink_arch      => 'x86_64',
          asm_arch         => 'x86_64',
          perlasm_scheme   => sub { vc_win64a_info()->{perlasm_scheme} },
@@ -19,7 +19,7 @@ index e74adb50..19024062 100644
      },
      "VC-WIN32" => {
          inherit_from     => [ "VC-noCE-common" ],
-@@ -1479,6 +1487,15 @@ my %targets = (
+@@ -1480,6 +1488,15 @@ my %targets = (
          # "WOW" stands for "Windows on Windows", and "VC-WOW" engages
          # some installation path heuristics in windows-makefile.tmpl...
          build_scheme     => add("VC-WOW", { separator => undef }),
